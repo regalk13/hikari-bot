@@ -1,3 +1,4 @@
 secrets/
 .venv/
 token
+__pycache__/
