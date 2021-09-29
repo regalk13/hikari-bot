@@ -8,7 +8,10 @@ import hikari
 import lightbulb
 import logging
 
-from testbot import __version__
+from testbot import __version__, STDOUT_CHANNEL_ID
+
+
+
 
 class Bot(lightbulb.Bot):
     def __init__(self) -> None:
@@ -19,8 +22,6 @@ class Bot(lightbulb.Bot):
         with open("./secrets/token", mode="r", encoding="utf-8") as f:
             token = f.read()
 
-        
-
         super().__init__(
             prefix="-",
             insensitive_commands=True,
@@ -28,6 +29,10 @@ class Bot(lightbulb.Bot):
             intents=hikari.Intents.ALL,
         ) 
 
+
+    @staticmethod
+    async def guild_only(message: hikari.Message) -> bool:
+        return message.guild_id is not None
 
 
     def run(self) -> None:
@@ -42,6 +47,10 @@ class Bot(lightbulb.Bot):
             )
         )
 
+    async def close(self) -> None:
+        await self.stdout_channel.send(f"Testing v{__version__} is shutting now :(") 
+        await super().close()
+
 
 
     async def on_starting(self, event: hikari.StartingEvent) -> None:
@@ -52,6 +61,10 @@ class Bot(lightbulb.Bot):
 
     async def on_started(self, event: hikari.StartedEvent) -> None:
         self.scheduler.start()
+        self.add_check(self.guild_only)
+        self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
+        await self.stdout_channel.send(f"Testing v{__version__} now online!") 
+
         logging.info("BOT READY!!!")
 
     async def on_stopping(self, event: hikari.StoppingEvent) -> None:

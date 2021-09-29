@@ -9,6 +9,7 @@ from testbot.bot import Bot
 class Fun(lightbulb.Plugin):
     @lightbulb.command(name="hello", aliases=("hi", "hey", "aloha", "hola"))
     async def command_hello(self, ctx: lightbulb.Context) -> None:
+        """Give a greeting."""
         greeting = random.choice(("Hello", "HI", "Hey"))
         await ctx.respond(f"{greeting} {ctx.member.mention}!", user_mentions=True)
 
@@ -16,6 +17,7 @@ class Fun(lightbulb.Plugin):
 
     @lightbulb.command(name="dice", aliases=("roll",))
     async def command_dice(self, ctx: lightbulb.Context, dice: str) -> None:
+        """Play a roll dice."""
         number, highest = (int(term) for term in dice.split("d"))
 
         if number > 25:
