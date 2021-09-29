@@ -1,7 +1,6 @@
 import lightbulb
 
 from testbot.bot import Bot
-
 class Meta(lightbulb.Plugin):
     @lightbulb.command(name="ping")
     async def command_ping(self, ctx: lightbulb.Context) -> None:
