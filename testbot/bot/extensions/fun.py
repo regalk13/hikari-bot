@@ -51,7 +51,7 @@ class Fun(lightbulb.Plugin):
 
 
         embed = (hikari.Embed(
-            title="Cat.",
+            title="Cat",
             colour=Color.from_rgb(r_r, r_b, r_g),
             timestamp=dt.datetime.now().astimezone()
         )
