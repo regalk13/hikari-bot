@@ -1,2 +1,3 @@
-# hikari-bot
+# Hikari Bot
+
 hikari bot
