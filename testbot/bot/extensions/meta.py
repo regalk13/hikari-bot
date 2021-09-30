@@ -17,9 +17,9 @@ class Meta(lightbulb.Plugin):
 
     @lightbulb.command(name="userinfo", aliases=("ui", "info", "user"))
     async def command_userinfo(self, ctx: lightbulb.Context, *,  target: hikari.Member = None) -> None:
+        """Look at the information of a user, empty argument represents see your own info."""
         target = target or ctx.member
         print(type(target))
-
 
 
         embed = (hikari.Embed(
