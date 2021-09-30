@@ -1,6 +1,10 @@
 import lightbulb
 import random
+import hikari
+import requests
+from hikari.colors import Color
 
+import datetime as dt
 
 from testbot.bot import Bot
 
@@ -33,6 +37,29 @@ class Fun(lightbulb.Plugin):
         print(text)
 
         await ctx.respond(f"``{text}``")
+
+    @lightbulb.command(name="cat", aliases=("gato",))
+    async def command_cat(self, ctx: lightbulb.Context) -> None:
+        
+        r_g = random.randint(1, 255)
+        r_b = random.randint(1, 255)
+        r_r = random.randint(1, 255)
+
+        image_url = requests.get("https://some-random-api.ml/img/cat")
+        image_link = image_url.json()
+        image = image_link['link']
+
+
+        embed = (hikari.Embed(
+            title="Cat.",
+            colour=Color.from_rgb(r_r, r_b, r_g),
+            timestamp=dt.datetime.now().astimezone()
+        )
+        .set_footer(text=f"Requestest by {ctx.member.display_name}")
+        .set_image(image)
+    )
+
+        await ctx.respond(embed=embed)
 
 
 def load(bot: Bot) -> None:
