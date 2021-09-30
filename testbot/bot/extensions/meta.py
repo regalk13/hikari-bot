@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 import hikari
+from hikari.colors import Color
 import lightbulb
 import datetime as dt
 from testbot.bot import Bot
@@ -15,14 +16,16 @@ class Meta(lightbulb.Plugin):
 
 
     @lightbulb.command(name="userinfo", aliases=("ui", "info", "user"))
-    async def command_userinfo(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+    async def command_userinfo(self, ctx: lightbulb.Context, *,  target: hikari.Member = None) -> None:
         target = target or ctx.member
+        print(type(target))
+
 
 
         embed = (hikari.Embed(
             title="User information.",
             description=f"Displaying information for {target.mention}",
-            colour=target.colour,
+            colour=Color(0xFF99CC),
             timestamp=dt.datetime.now().astimezone()
 
         )
@@ -31,7 +34,7 @@ class Meta(lightbulb.Plugin):
         .add_field(name="Test", value="Test")
     )
     
-        await ctx.response(embed=embed)
+        await ctx.respond(embed=embed)
 
 
 def load(bot: Bot) -> None:

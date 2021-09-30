@@ -27,6 +27,14 @@ class Fun(lightbulb.Plugin):
         rolls = [random.randint(1, highest) for i in range(number)]
         await ctx.respond(" + ".join(str(r) for r in rolls) + f" = {sum(rolls):,}", reply=True, mentions_reply=True)
 
+
+    @lightbulb.command(name="say")
+    async def command_say(self, ctx: lightbulb.Context, *, text: str) -> None:
+        print(text)
+
+        await ctx.respond(f"``{text}``")
+
+
 def load(bot: Bot) -> None:
     bot.add_plugin(Fun())
 
