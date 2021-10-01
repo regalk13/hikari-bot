@@ -19,16 +19,28 @@ class Meta(lightbulb.Plugin):
         """Look at the information of a user, empty argument represents see your own info."""
         target = target or ctx.member
         roles = []
-        u_roles = ""
         for role in target.get_roles():
             roles.append(role.mention)
 
-        for r in roles:
-            u_roles += r
+        u_roles = ", ".join(roles)
+    
 
         r_g = random.randint(1, 255)
         r_b = random.randint(1, 255)
         r_r = random.randint(1, 255)
+
+        
+        presence = target.get_presence()
+        if presence is None:
+            activity_ = "No activity."
+
+        else:
+            activitys = []
+            for activity in presence.activities:
+                activitys.append(activity.name)
+
+
+            activity_ = ', '.join(activitys)
 
         embed = (hikari.Embed(
             title="User information.",
@@ -37,10 +49,29 @@ class Meta(lightbulb.Plugin):
             timestamp=dt.datetime.now().astimezone()
         )
         .set_author(name="Information")
-        .set_footer(text=f"Requestest by {ctx.member.display_name}")
-        .add_field(name="Created at", value=target.created_at.strftime("%b %d,%Y  %H:%M:%S"), inline=False)
-        .add_field(name="Joined at", value=target.joined_at.strftime("%b %d,%Y  %H:%M:%S"))
-        .add_field(name="Roles", value=u_roles)
+        .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.member.avatar_url)
+        .add_field(name="ID", value=target.id)
+        .add_field(name="Discriminator", value=target.discriminator, inline=True)
+        .add_field(name="Bot?", value=target.is_bot, inline=True)
+        .add_field(name="No. of roles", value=len(target.role_ids), inline=True)
+        .add_field(name="Created at", value=target.created_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
+        .add_field(name="Joined at", value=target.joined_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
+        .add_field(
+            name="Boosted since",
+            value=getattr(target.premium_since, "strftime", lambda x: "Not boosting")("%d %b %Y"),
+            inline=True
+        )       
+
+        .add_field(
+            name="Roles",
+            value=u_roles
+        ) 
+
+
+        .add_field(name="Presence", 
+        value=activity_)
+        #.add_field(name="Roles", value=" | ".join(r.mention for r in reversed(target.role_ids[1:])))
+        
         .set_thumbnail(target.avatar_url)
     )
     

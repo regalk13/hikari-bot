@@ -59,6 +59,21 @@ class Activity(lightbulb.Plugin):
         await self.activity_app(ctx, 832012774040141894, "Chess", "https://cdn.discordapp.com/attachments/860628329362227251/893271938439454800/images.png")
 
 
+    @lightbulb.command(name="lettertittle", aliases=("lt", "LT"))
+    async def command_letter(self, ctx: lightbulb.Context) -> None:
+        await self.activity_app(ctx, 879863686565621790, "Letter Title", "https://cdn.discordapp.com/attachments/860628329362227251/893476443017871420/unknown.png")
+
+
+    @lightbulb.command(name="wordsnak", aliases=("WS", "ws"))
+    async def command_word(self, ctx: lightbulb.Context) -> None:
+        await self.activity_app(ctx, 879863976006127627, "Word Snak", "https://cdn.discordapp.com/attachments/860628329362227251/893476503055106048/unknown.png")
+
+
+    @lightbulb.command(name="doodlecrew", aliases=("DC", "dc"))
+    async def command_doodle(self, ctx: lightbulb.Context) -> None:
+        await self.activity_app(ctx, 878067389634314250, "Doodle Crew", "https://cdn.discordapp.com/attachments/860628329362227251/893476175870050344/unknown.png")
+
+
 
 def load(bot: Bot) -> None:
     bot.add_plugin(Activity(bot))
