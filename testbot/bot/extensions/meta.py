@@ -8,6 +8,11 @@ import random
 
 import typing as t
 class Meta(lightbulb.Plugin):
+    def __init__(self, bot: Bot):
+        super().__init__(name="Meta")
+        self.bot = bot
+
+
     @lightbulb.command(name="ping")
     async def command_ping(self, ctx: lightbulb.Context) -> None:
         """Look at the latency of the bot."""
@@ -78,8 +83,42 @@ class Meta(lightbulb.Plugin):
         await ctx.respond(embed=embed)
 
 
+
+    @lightbulb.command(name="serverinfo", aliases=("guildinfo",))
+    async def command_severinfo(self, ctx: lightbulb.Context) -> None:
+        member = ctx.member
+        guild = await self.bot.rest.fetch_guild(member.guild_id)
+
+        owner = guild.get_member(guild.owner_id)
+
+        r_g = random.randint(1, 255)
+        r_b = random.randint(1, 255)
+        r_r = random.randint(1, 255)
+
+        embed = (hikari.Embed(
+            title=f"Server Information of {guild.name}",
+            colour=Color.from_rgb(r_r, r_b, r_g),
+            timestamp=dt.datetime.now().astimezone()
+
+        )
+        .set_thumbnail(guild.icon_url)
+        .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.member.avatar_url)
+
+        .add_field(name="ID", value=guild.id)
+        .add_field(name="Owner", value=owner.mention, inline=True)
+        .add_field(name="Created", value=ctx.guild_id.created_at.strftime("%d/%m/%Y %H:%M:%S"), inline=True)
+        .add_field(name="Members", value=guild.approximate_member_count, inline=True)
+        #.add_field(name="People", value="On test", inline=True)
+        #.add_field(name="Bots", value="On test", inline=True)
+        .add_field(name="Channels", value="s", inline=True)
+        .add_field(name="Roles", value=len(guild.roles), inline=True)
+        .add_field(name="Invites", value="On test", inline=True)
+        )
+
+        await ctx.respond(embed)
+
 def load(bot: Bot) -> None:
-    bot.add_plugin(Meta())
+    bot.add_plugin(Meta(bot))
 
 def unload(bot: Bot) -> None:
     bot.remove_plugin("Meta")
