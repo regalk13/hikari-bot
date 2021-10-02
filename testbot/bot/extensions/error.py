@@ -21,10 +21,13 @@ class ErrorHandler(lightbulb.Plugin):
             return await event.context.respond("Too many arguments were passed.")
 
         if isinstance(event.exception, lightbulb.errors.CommandIsOnCooldown):
-            return await event.context.respond(F"Command is on cooldown. Truy again in {event.exception.retry_after:.0f} second(s).")
+            return await event.context.respond(f"Command is on cooldown. Truy again in {event.exception.retry_after:.0f} second(s).")
 
+        if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
+            return await event.context.respond("You don't have the required permissions for this action.")
+        
 
-        await event.context.respond("I have a error, please help me :(.")
+        await event.context.respond("I have a error, please help me <:tiste:889343933304426536>")
         raise event.exception
 
 

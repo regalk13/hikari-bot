@@ -32,7 +32,7 @@ class Activity(lightbulb.Plugin):
             .set_thumbnail(image)
             )
 
-            await ctx.respond(embed)
+            await ctx.respond(embed, reply=True)
 
     @lightbulb.command(name="youtube", aliases=("YT", "yt"))
     async def command_youtube(self, ctx: lightbulb.Context) -> None:

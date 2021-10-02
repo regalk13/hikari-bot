@@ -51,15 +51,14 @@ class Fun(lightbulb.Plugin):
 
 
         embed = (hikari.Embed(
-            title="Cat",
-            colour=Color.from_rgb(r_r, r_b, r_g),
+            colour=Color(0x36393f),
             timestamp=dt.datetime.now().astimezone()
         )
-        .set_footer(text=f"Requestest by {ctx.member.display_name}")
+        .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.author.avatar_url)
         .set_image(image)
     )
 
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, reply=True)
 
 
 def load(bot: Bot) -> None:

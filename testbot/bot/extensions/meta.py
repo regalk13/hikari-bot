@@ -1,4 +1,4 @@
-from os import RTLD_GLOBAL
+from os import RTLD_GLOBAL, replace
 import hikari
 from hikari.colors import Color
 import lightbulb
@@ -48,39 +48,39 @@ class Meta(lightbulb.Plugin):
             activity_ = ', '.join(activitys)
 
         embed = (hikari.Embed(
-            title="User information.",
+            title="User information",
             description=f"Displaying information for {target.mention}",
             colour=Color.from_rgb(r_r, r_b, r_g),
             timestamp=dt.datetime.now().astimezone()
         )
         .set_author(name="Information")
         .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.member.avatar_url)
-        .add_field(name="ID", value=target.id)
-        .add_field(name="Discriminator", value=target.discriminator, inline=True)
-        .add_field(name="Bot?", value=target.is_bot, inline=True)
-        .add_field(name="No. of roles", value=len(target.role_ids), inline=True)
-        .add_field(name="Created at", value=target.created_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
-        .add_field(name="Joined at", value=target.joined_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
+        .add_field(name="<:ID:893578566296555520>", value=target.id)
+        .add_field(name="<:User:893597475867336795> Discriminator", value=target.discriminator, inline=True)
+        .add_field(name="<:Bot:893579925892767784> Bot?", value=target.is_bot, inline=True)
+        .add_field(name="<:Role:893595137387675658> No. of roles", value=len(target.role_ids), inline=True)
+        .add_field(name="<:New:893595680306774047> Created at", value=target.created_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
+        .add_field(name="<:Join:893595887853506600> Joined at", value=target.joined_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
         .add_field(
-            name="Boosted since",
+            name="<:Boost:893579717821755402> Boosted since",
             value=getattr(target.premium_since, "strftime", lambda x: "Not boosting")("%d %b %Y"),
             inline=True
         )       
 
         .add_field(
-            name="Roles",
+            name="<:Info:893583131536412772> Roles",
             value=u_roles
         ) 
 
 
-        .add_field(name="Presence", 
+        .add_field(name="<:Presence:893596200148811776> Presence", 
         value=activity_)
         #.add_field(name="Roles", value=" | ".join(r.mention for r in reversed(target.role_ids[1:])))
         
         .set_thumbnail(target.avatar_url)
     )
     
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, reply=True)
 
 
 
@@ -91,31 +91,58 @@ class Meta(lightbulb.Plugin):
 
         owner = guild.get_member(guild.owner_id)
 
-        r_g = random.randint(1, 255)
-        r_b = random.randint(1, 255)
-        r_r = random.randint(1, 255)
+        channels = 0  
+        bots = 0
+        for channel in guild.get_channels().values():
+            channels += 1
+              
+        for member in guild.get_members().values():
+            if member.is_bot:
+                bots += 1
+
 
         embed = (hikari.Embed(
-            title=f"Server Information of {guild.name}",
-            colour=Color.from_rgb(r_r, r_b, r_g),
+            title=f"Server Information",
+            description=guild.description,
+            colour=Color(0x36393f),
             timestamp=dt.datetime.now().astimezone()
 
         )
         .set_thumbnail(guild.icon_url)
         .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.member.avatar_url)
+        .set_author(name=guild.name, icon=guild.icon_url)
 
-        .add_field(name="ID", value=guild.id)
-        .add_field(name="Owner", value=owner.mention, inline=True)
-        .add_field(name="Created", value=ctx.guild_id.created_at.strftime("%d/%m/%Y %H:%M:%S"), inline=True)
-        .add_field(name="Members", value=guild.approximate_member_count, inline=True)
-        #.add_field(name="People", value="On test", inline=True)
-        #.add_field(name="Bots", value="On test", inline=True)
-        .add_field(name="Channels", value="s", inline=True)
-        .add_field(name="Roles", value=len(guild.roles), inline=True)
-        .add_field(name="Invites", value="On test", inline=True)
+        .add_field(name="<:ID:893578566296555520>", value=guild.id)
+        .add_field(name="<:Owner:893579388774395964> Owner", value=owner.mention, inline=True)
+        .add_field(name="<:Book:893580795111936050> Created", value=ctx.guild_id.created_at.strftime("%d/%m/%Y"), inline=True)
+        .add_field(name="<:Members:893581084762185739> Members", value=guild.approximate_member_count, inline=True)
+        .add_field(name="<:Bot:893579925892767784> Bots", value=bots, inline=True)
+        .add_field(name="<:Config:893582228246892554> Channels", value=channels, inline=True)
+        .add_field(name="<:Info:893583131536412772> Roles", value=len(guild.roles), inline=True)
+        .add_field(name="<:Invite:893581721721770064> Invites", value=f"{len(ctx.bot.cache.get_invites_view_for_guild(guild)):,}", inline=True)
+        .add_field(name="<:Emote:893580385261350953> Emotes", value=f"{len(guild.emojis):,}", inline=True)
+        .add_field(name="<:Boost:893579717821755402> Boosts", value=guild.premium_subscription_count, inline=True)
         )
 
-        await ctx.respond(embed)
+        await ctx.respond(embed, reply=True)
+
+
+    @lightbulb.command(name="pfp", aliases=("picture"))
+    async def command_pfp(self, ctx: lightbulb.Context, *, target: lightbulb.member_converter = None) -> None:
+        target = target or ctx.member
+        image = target.avatar_url
+
+        embed = (hikari.Embed(
+            colour=Color(0x36393f),
+            description=f"[Image]({image})",
+        )
+        .set_author(name=f"{target.username}#{target.discriminator}", icon=target.avatar_url)
+        .set_image(image)
+        )
+
+        await ctx.respond(embed=embed, reply=True)
+
+
 
 def load(bot: Bot) -> None:
     bot.add_plugin(Meta(bot))
