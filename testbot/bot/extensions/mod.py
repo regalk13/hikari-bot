@@ -12,7 +12,7 @@ class Mod(lightbulb.Plugin):
 
     @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.KICK_MEMBERS))
     @lightbulb.command(name="kick")
-    async def command_kick(self, ctx: lightbulb.Context, target: lightbulb.member_converter, reason="No Reason") -> None:
+    async def command_kick(self, ctx: lightbulb.Context, target: lightbulb.member_converter, *, reason="No Reason") -> None:
         """Look at the latency of the bot."""
         self.log_channel = await self.bot.rest.fetch_channel(887515478304624730)
 
@@ -37,7 +37,7 @@ class Mod(lightbulb.Plugin):
 
     @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.BAN_MEMBERS))
     @lightbulb.command(name="ban")
-    async def command_ban(self, ctx: lightbulb.Context, target: lightbulb.member_converter, reason="No Reason") -> None:
+    async def command_ban(self, ctx: lightbulb.Context, target: lightbulb.member_converter, *, reason="No Reason") -> None:
         """Look at the latency of the bot."""
         self.log_channel = await self.bot.rest.fetch_channel(887515478304624730)
 
@@ -61,14 +61,24 @@ class Mod(lightbulb.Plugin):
 
     @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_MESSAGES))
     @lightbulb.command(name="clear", aliases=("purge",))
-    async def command_clear(self, ctx: lightbulb.Context, limit: int = 1):        
-        
-        message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
+    async def command_clear(self, ctx: lightbulb.Context, limit: int = 1):
 
-        await self.bot.rest.delete_messages(ctx.channel_id, 893841545504108565, ctx.message_id)
-        await self.bot.rest.edit_message(ctx.channel_id, message.id, content="<a:Right:893842032248885249> Message(s) deleted.")
-        await asyncio.sleep(5)
-        await self.bot.rest.delete_messages(ctx.channel_id, message.id)
+        if 0 < limit <= 500:
+            channel = await self.bot.rest.fetch_channel(ctx.channel_id)
+            message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
+            await ctx.message.delete()
+
+
+            async for messages in channel.fetch_history(before=ctx.timestamp).limit(limit):
+                await messages.delete()
+
+            await message.delete()
+            message_ = await ctx.respond(f"<a:Right:893842032248885249> {limit} Message(s) deleted.")
+            await asyncio.sleep(5)
+            await message_.delete()
+
+        else:
+            await ctx.respond("<a:Wrong:893873540846198844> The number of messages you want to delete is not within the limits.")
 
 
 def load(bot: Bot) -> None:

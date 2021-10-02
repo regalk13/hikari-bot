@@ -93,6 +93,11 @@ class Meta(lightbulb.Plugin):
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
 
+
+        r_g = random.randint(1, 255)
+        r_b = random.randint(1, 255)
+        r_r = random.randint(1, 255)
+
         owner = guild.get_member(guild.owner_id)
 
         channels = 0  
@@ -108,7 +113,7 @@ class Meta(lightbulb.Plugin):
         embed = (hikari.Embed(
             title=f"Server Information",
             description=guild.description,
-            colour=Color(0x36393f),
+            colour=Color.from_rgb(r_r, r_b, r_g),
             timestamp=dt.datetime.now().astimezone()
 
         )
@@ -151,7 +156,16 @@ class Meta(lightbulb.Plugin):
     async def command_botinfo(self, ctx: lightbulb.Context) -> None:
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
+        guilds = self.bot.cache.get_guilds_view()
+        users = self.bot.cache.get_members_view()
+        members = []
+        for user in users:
+            guild_ = await self.bot.rest.fetch_guild(user)
+            for member in guild_.get_members().values():
+                members.append(member)
 
+
+    
         r_g = random.randint(1, 255)
         r_b = random.randint(1, 255)
         r_r = random.randint(1, 255)
@@ -163,7 +177,7 @@ class Meta(lightbulb.Plugin):
             mem_of_total = proc.memory_percent()
             mem_usage = mem_total * (mem_of_total / 100)
 
-        bots = guild.get_member(892053033792454727)
+        bots = guild.get_my_member()
         embed = (hikari.Embed(
             description="Saiki the best option",
             colour=Color.from_rgb(r_r,r_g,r_b),
@@ -181,8 +195,8 @@ class Meta(lightbulb.Plugin):
         .add_field(name="<:Devs:893886631017345064> Devs", value="> Lesly❁#9306 \n > Regalk#1654", inline=True)
         .add_field(name="<:Config:893582228246892554> CPU", value=f"> {cpu_time}%", inline=True)
         .add_field(name="<:Presence:893596200148811776> Memory Used", value=f"> {mem_usage:,.3f} Mib", inline=True)
-        .add_field(name="<:Members:893581084762185739> Users", value="> On test", inline=True)
-        .add_field(name="<:Book:893580795111936050> Servers", value="> On test", inline=True)
+        .add_field(name="<:Members:893581084762185739> Users", value=f"> {len(members)}", inline=True)
+        .add_field(name="<:Book:893580795111936050> Servers", value=f"> {len(guilds)}", inline=True)
         .add_field(name="<:New:893595680306774047> Create at", value="> ``01/08/2021``", inline=True)
         )
 
