@@ -40,11 +40,6 @@ class Fun(lightbulb.Plugin):
 
     @lightbulb.command(name="cat", aliases=("gato",))
     async def command_cat(self, ctx: lightbulb.Context) -> None:
-        
-        r_g = random.randint(1, 255)
-        r_b = random.randint(1, 255)
-        r_r = random.randint(1, 255)
-
         image_url = requests.get("https://some-random-api.ml/img/cat")
         image_link = image_url.json()
         image = image_link['link']

@@ -41,7 +41,7 @@ class Admin(lightbulb.Plugin):
                 logging.error(f"Extension {ext} is not loaded")
 
 
-        await ctx.respond(f"{count} extension(s) {action}ed.")
+        await ctx.respond(f"<a:Right:893842032248885249> {count} extension(s) {action}ed.")
 
 
 

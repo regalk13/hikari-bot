@@ -1,3 +1,4 @@
+import asyncio
 import lightbulb
 import hikari 
 from testbot.bot import Bot
@@ -29,8 +30,6 @@ class Mod(lightbulb.Plugin):
         .add_field(name="<:Invite:893581721721770064> Reason", value=reason)
         .set_thumbnail(target.avatar_url)
         )
-
-
         
         await guild.kick(target)
         await self.log_channel.send(embed) 
@@ -51,16 +50,25 @@ class Mod(lightbulb.Plugin):
                 timestamp=dt.datetime.now().astimezone()
 
         )
-        .add_field(name="Member", value=f"{target.mention}", inline=True)
-        .add_field(name="Banned by", value=f"{ctx.author.mention}", inline=True)
-        .add_field(name="Reason", value=reason)
+        .add_field(name="<:User:893597475867336795> Member", value=f"{target.mention}", inline=True)
+        .add_field(name="<:Staff:893660996458147861> Banned by", value=f"{ctx.author.mention}", inline=True)
+        .add_field(name="<:Invite:893581721721770064> Reason", value=reason)
         .set_thumbnail(target.avatar_url)
         )
-
-
         
         await guild.ban(target)
         await self.log_channel.send(embed) 
+
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_MESSAGES))
+    @lightbulb.command(name="clear", aliases=("purge",))
+    async def command_clear(self, ctx: lightbulb.Context, limit: int = 1):        
+        
+        message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
+
+        await self.bot.rest.delete_messages(ctx.channel_id, 893841545504108565, ctx.message_id)
+        await self.bot.rest.edit_message(ctx.channel_id, message.id, content="<a:Right:893842032248885249> Message(s) deleted.")
+        await asyncio.sleep(5)
+        await self.bot.rest.delete_messages(ctx.channel_id, message.id)
 
 
 def load(bot: Bot) -> None:
