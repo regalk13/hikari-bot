@@ -38,19 +38,21 @@ class Meta(lightbulb.Plugin):
         r_b = random.randint(1, 255)
         r_r = random.randint(1, 255)
 
-        
+
+        activity_ = "No activity."
         presence = target.get_presence()
-        if presence is None:
+        print(presence.activities)
+        if presence.activities == []:
             activity_ = "No activity."
 
         else:
             activitys = []
             for activity in presence.activities:
-                activitys.append(activity.name)
+                 activitys.append(activity.name)
 
 
             activity_ = ', '.join(activitys)
-
+    
         embed = (hikari.Embed(
             title="User information",
             description=f"Displaying information for {target.mention}",
@@ -158,6 +160,8 @@ class Meta(lightbulb.Plugin):
         guild = await self.bot.rest.fetch_guild(member.guild_id)
         guilds = self.bot.cache.get_guilds_view()
         users = self.bot.cache.get_members_view()
+
+        
         members = []
         for user in users:
             guild_ = await self.bot.rest.fetch_guild(user)
