@@ -57,6 +57,32 @@ class Mod(lightbulb.Plugin):
         )
         
         await guild.ban(target)
+        await self.log_channel.send(embed)
+        
+
+    
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.BAN_MEMBERS))
+    @lightbulb.command(name="unban")
+    async def command_unban(self, ctx: lightbulb.Context, target: lightbulb.member_converter, *, reason="No Reason") -> None:
+        """Look at the latency of the bot."""
+        self.log_channel = await self.bot.rest.fetch_channel(887515478304624730)
+
+        member = ctx.member
+        guild = await self.bot.rest.fetch_guild(member.guild_id)
+
+        embed = (hikari.Embed(
+                title="Member Unbanned",
+                colour=Color(0xff0000),
+                timestamp=dt.datetime.now().astimezone()
+
+        )
+        .add_field(name="<:User:893597475867336795> Member", value=f"{target.mention}", inline=True)
+        .add_field(name="<:Staff:893660996458147861> Unanned by", value=f"{ctx.author.mention}", inline=True)
+        .add_field(name="<:Invite:893581721721770064> Reason", value=reason)
+        .set_thumbnail(target.avatar_url)
+        )
+        
+        await guild.unban(target)
         await self.log_channel.send(embed) 
 
     @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_MESSAGES))
