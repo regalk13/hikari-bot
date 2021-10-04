@@ -1,5 +1,6 @@
 from os import RTLD_GLOBAL, replace
 import hikari
+from hikari.api.special_endpoints import ButtonBuilder
 from hikari.colors import Color
 import lightbulb
 import datetime as dt
@@ -206,6 +207,13 @@ class Meta(lightbulb.Plugin):
         )
 
         await ctx.respond(embed, reply=True)
+
+
+    @lightbulb.command(name="invite")
+    async def command_invite(self, ctx: lightbulb.Context):
+        message = await ctx.respond("Working on this")
+                
+
 
 
 def load(bot: Bot) -> None:

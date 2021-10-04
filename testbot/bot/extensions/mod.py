@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import lightbulb
 import hikari 
 from testbot.bot import Bot

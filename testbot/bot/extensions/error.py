@@ -26,6 +26,8 @@ class ErrorHandler(lightbulb.Plugin):
         if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
             return await event.context.respond("<a:Wrong:893873540846198844> You don't have the required permissions for this action.")
         
+        if isinstance(event.exception, lightbulb.errors.CheckFailure):
+            return None
 
         await event.context.respond("I have a error, please help me <:tiste:889343933304426536>")
         raise event.exception
