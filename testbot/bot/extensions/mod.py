@@ -81,6 +81,17 @@ class Mod(lightbulb.Plugin):
             await ctx.respond("<a:Wrong:893873540846198844> The number of messages you want to delete is not within the limits.")
 
 
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_GUILD))
+    @lightbulb.command(name="slowmode", aliases=("sm",))
+    async def command_slowmode(self, ctx: lightbulb.Context, seconds: int = 1):
+        member = ctx.member
+        guild = await self.bot.rest.fetch_guild(member.guild_id)
+        channel = guild.get_channel(ctx.channel_id)
+        await channel.edit(rate_limit_per_user=seconds)
+        message = await ctx.respond(f"<a:Right:893842032248885249> slowmode of {seconds} second(s) applied.")
+        await asyncio.sleep(5)
+        await message.delete()
+    
 def load(bot: Bot) -> None:
     bot.add_plugin(Mod(bot))
 

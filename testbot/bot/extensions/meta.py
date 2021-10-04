@@ -155,13 +155,13 @@ class Meta(lightbulb.Plugin):
         await ctx.respond(embed=embed, reply=True)
 
 
+    #@lightbulb.cooldown(10, 1, lightbulb.UserBucket)
     @lightbulb.command(name="botinfo", aliases=("bi",))
     async def command_botinfo(self, ctx: lightbulb.Context) -> None:
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
         guilds = self.bot.cache.get_guilds_view()
         users = self.bot.cache.get_members_view()
-
         
         members = []
         for user in users:

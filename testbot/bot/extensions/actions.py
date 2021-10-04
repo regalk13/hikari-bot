@@ -275,13 +275,13 @@ class Actions(lightbulb.Plugin):
 
 
     @lightbulb.command(name="poke", aliases=("Poke",))
-    async def command_poke(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+    async def command_poke(self, ctx: lightbulb.Context, target: lightbulb.member_converter) -> None:
         gif = self.get_gif("anime-poke")
 
         await self.action(ctx, f"**{ctx.member.username}** bothers to **{target.username}**", gif)
 
     @lightbulb.command(name="snowball", aliases=("Snowball",))
-    async def command_snowball(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+    async def command_snowball(self, ctx: lightbulb.Context, target: lightbulb.member_converter) -> None:
         gif = self.get_gif("anime-snowball")
 
         await self.action(ctx, f"**{ctx.member.username}** I throw a snowball at **{target.username}**", gif)
@@ -332,7 +332,227 @@ class Actions(lightbulb.Plugin):
         gif = self.get_gif("anime-spank")
 
         await self.action(ctx, f"**{ctx.member.username}** spank **{target.username}**", gif)
+    
+    @lightbulb.command(name="sleep", aliases=("Sleep",))
+    async def command_sleep(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+        gif = self.get_gif("anime-sleep")
 
+        if target == None:
+            await self.action(ctx, f"**{ctx.member.username}** is sleeping or going to sleep", gif)
+
+        else:
+            await self.action(ctx, f"**{ctx.member.username}** is sleeping or going to sleep whit **{target.username}**", gif)
+
+    @lightbulb.command(name="confused", aliases=("Confused",))
+    async def command_confused(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-confused")
+
+        await self.action(ctx, f"**{ctx.member.username}** is confused.", gif)
+
+    @lightbulb.command(name="disgusted", aliases=("Disgusted",))
+    async def command_disgusted(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-disgusted")
+
+        await self.action(ctx, f"**{ctx.member.username}** is disgusted.", gif)
+
+    @lightbulb.command(name="happy", aliases=("Happy",))
+    async def command_happy(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-happy")
+
+        await self.action(ctx, f"**{ctx.member.username}** feels happy.", gif)
+
+    @lightbulb.command(name="pout", aliases=("Pout",))
+    async def command_disgusted(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-pout")
+
+        await self.action(ctx, f"**{ctx.member.username}** pouts.", gif)
+
+
+    @lightbulb.command(name="shrug", aliases=("Shrug",))
+    async def command_shrug(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-shrug")
+
+        await self.action(ctx, f"**{ctx.member.username}** doesn't know or doesn't care.", gif)
+
+
+    @lightbulb.command(name="teehee", aliases=("Teehee",))
+    async def command_teehee(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-teehee")
+
+        await self.action(ctx, f"**{ctx.member.username}** giggles. >w<", gif)
+
+    @lightbulb.command(name="wasted", aliases=("Wasted",))
+    async def command_wasted(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-wasted")
+
+        await self.action(ctx, f"**{ctx.member.username}** wasted...", gif)
+
+        
+    @lightbulb.command(name="banghead", aliases=("Banghead",))
+    async def command_banghead(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-banghead")
+
+        await self.action(ctx, f"**{ctx.member.username}** hits his head.", gif)
+
+    @lightbulb.command(name="cry", aliases=("Cry",))
+    async def command_cry(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-cry")
+
+        await self.action(ctx, f"**{ctx.member.username}** is crying.", gif)
+
+    @lightbulb.command(name="drunk", aliases=("Drunk",))
+    async def command_drunk(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-drunk")
+
+        await self.action(ctx, f"**{ctx.member.username}** got drunk.", gif)
+
+    @lightbulb.command(name="lewd", aliases=("Lewd",))
+    async def command_lewd(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-lewd")
+
+        await self.action(ctx, f"**{ctx.member.username}** is thinking lewd things.", gif)
+
+    @lightbulb.command(name="psycho", aliases=("Psycho",))
+    async def command_psycho(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-psycho")
+
+        await self.action(ctx, f"**{ctx.member.username}** psycho mode.", gif)
+
+    @lightbulb.command(name="sing", aliases=("Sing",))
+    async def command_sing(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-sing")
+
+        await self.action(ctx, f"**{ctx.member.username}** is singing.", gif)
+
+    @lightbulb.command(name="think", aliases=("Think",))
+    async def command_think(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-think")
+
+        await self.action(ctx, f"**{ctx.member.username}** is thinking.", gif)
+
+    @lightbulb.command(name="yandere", aliases=("Yandere",))
+    async def command_yandere(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-yandere")
+
+        await self.action(ctx, f"**{ctx.member.username}** yandere mode.", gif)
+
+    @lightbulb.command(name="blush", aliases=("Blush",))
+    async def command_blush(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-blush")
+
+        await self.action(ctx, f"**{ctx.member.username}** blushed.", gif)
+
+    @lightbulb.command(name="eat", aliases=("Eat",))
+    async def command_eat(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-eat")
+
+        await self.action(ctx, f"**{ctx.member.username}** is eating.", gif)
+
+    @lightbulb.command(name="like", aliases=("Like",))
+    async def command_like(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-likes")
+
+        await self.action(ctx, f"**{ctx.member.username}** likes it.", gif)
+
+
+    @lightbulb.command(name="run", aliases=("Run",))
+    async def command_run(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-run")
+
+        await self.action(ctx, f"**{ctx.member.username}** is running.", gif)
+
+    @lightbulb.command(name="sip", aliases=("Sip",))
+    async def command_run(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-sip")
+
+        await self.action(ctx, f"**{ctx.member.username}** sips.", gif)
+    
+    @lightbulb.command(name="run", aliases=("Run",))
+    async def command_run(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-run")
+
+        await self.action(ctx, f"**{ctx.member.username}** is running.", gif)
+    
+    @lightbulb.command(name="boom", aliases=("Boom",))
+    async def command_boom(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-explosion")
+
+        await self.action(ctx, f"Boom!!!.", gif)
+    
+    @lightbulb.command(name="dance", aliases=("Dance",))
+    async def command_dance(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-dance")
+
+        await self.action(ctx, f"**{ctx.member.username}** is dancing.", gif)
+    
+    @lightbulb.command(name="facepalm", aliases=("Facepalm",))
+    async def command_facepalm(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-facepalm")
+
+        await self.action(ctx, f"**{ctx.member.username}** face palm.", gif)
+    
+    @lightbulb.command(name="nope", aliases=("Nope",))
+    async def command_nope(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-nope")
+
+        await self.action(ctx, f"**{ctx.member.username}** say nope.", gif)
+
+    @lightbulb.command(name="sad", aliases=("Sad",))
+    async def command_sad(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-sad")
+
+        await self.action(ctx, f"**{ctx.member.username}** feels sad man.", gif)
+            
+    @lightbulb.command(name="wag", aliases=("Wag",))
+    async def command_wag(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-wag-tail")
+
+        await self.action(ctx, f"**{ctx.member.username}** wag his tail.", gif)
+            
+    @lightbulb.command(name="vomit", aliases=("Vomit",))
+    async def command_vomit(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-vomit")
+
+        await self.action(ctx, f"**{ctx.member.username}** is vomiting.", gif)
+            
+    @lightbulb.command(name="bored", aliases=("Bored",))
+    async def command_bored(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-bored")
+
+        await self.action(ctx, f"**{ctx.member.username}** is bored.", gif)
+
+    @lightbulb.command(name="deredere", aliases=("Deredere",))
+    async def command_deredere(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-deredere")
+
+        await self.action(ctx, f"**{ctx.member.username}** falls in love.", gif)
+
+    @lightbulb.command(name="fail", aliases=("Fail",))
+    async def command_fail(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-fail")
+
+        await self.action(ctx, f"**{ctx.member.username}** failed.", gif)
+
+    @lightbulb.command(name="peek", aliases=("Peek",))
+    async def command_peek(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-peek")
+
+        await self.action(ctx, f"**{ctx.member.username}** is peeking", gif)
+
+    @lightbulb.command(name="scream", aliases=("Scream",))
+    async def command_scream(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-scream")
+
+        await self.action(ctx, f"**{ctx.member.username}** scream!!!", gif)
+
+    @lightbulb.command(name="smug", aliases=("Smug",))
+    async def command_smug(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("anime-smug")
+
+        await self.action(ctx, f"**{ctx.member.username}** smuging.", gif)
+
+
+    
 
 def load(bot: Bot) -> None:
     bot.add_plugin(Actions())
