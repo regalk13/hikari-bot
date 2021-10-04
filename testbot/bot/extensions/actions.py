@@ -287,6 +287,52 @@ class Actions(lightbulb.Plugin):
         await self.action(ctx, f"**{ctx.member.username}** I throw a snowball at **{target.username}**", gif)
 
     
+    @lightbulb.command(name="tickle", aliases=("Tickle",))
+    async def command_tickle(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+        gif = self.get_gif("anime-tickle")
+
+        if target == None:
+            await self.action(ctx, f"Jejeje :D", gif)
+
+        else:
+            await self.action(ctx, f"**{ctx.member.username}** tickles **{target.username}**", gif)
+
+
+    @lightbulb.command(name="cheeks", aliases=("Cheeks",))
+    async def command_cheeks(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+        gif = self.get_gif("anime-cheeks")
+
+        if target == None:
+            await self.action(ctx, f"Jejeje :D", gif)
+
+        else:
+            await self.action(ctx, f"**{ctx.member.username}** pin the cheeks of**{target.username}**", gif)
+
+
+    @lightbulb.command(name="gaming", aliases=("Gaming",))
+    async def command_gaming(self, ctx: lightbulb.Context, target: lightbulb.member_converter = None) -> None:
+        gif = self.get_gif("anime-gaming")
+
+        if target == None:
+            await self.action(ctx, f"**{ctx.member.username}** is playing", gif)
+
+        else:
+            await self.action(ctx, f"**{ctx.member.username}** is playing with **{target.username}**", gif)
+
+
+    @lightbulb.command(name="punch", aliases=("Punch",))
+    async def command_punch(self, ctx: lightbulb.Context, target: lightbulb.member_converter) -> None:
+        gif = self.get_gif("anime-punch")
+
+        await self.action(ctx, f"**{ctx.member.username}** punch **{target.username}**", gif)
+
+
+    @lightbulb.command(name="spank", aliases=("Spank",))
+    async def command_spank(self, ctx: lightbulb.Context, target: lightbulb.member_converter) -> None:
+        gif = self.get_gif("anime-spank")
+
+        await self.action(ctx, f"**{ctx.member.username}** spank **{target.username}**", gif)
+
 
 def load(bot: Bot) -> None:
     bot.add_plugin(Actions())

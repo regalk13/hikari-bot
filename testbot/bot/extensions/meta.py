@@ -41,17 +41,20 @@ class Meta(lightbulb.Plugin):
 
         activity_ = "No activity."
         presence = target.get_presence()
-        print(presence.activities)
-        if presence.activities == []:
+        if presence == None:
             activity_ = "No activity."
 
         else:
-            activitys = []
-            for activity in presence.activities:
-                 activitys.append(activity.name)
+            if presence.activities == []:
+                activity_ = "No activity."
+
+            else:
+                activitys = []
+                for activity in presence.activities:
+                    activitys.append(activity.name)
 
 
-            activity_ = ', '.join(activitys)
+                activity_ = ', '.join(activitys)
     
         embed = (hikari.Embed(
             title="User information",
@@ -90,7 +93,7 @@ class Meta(lightbulb.Plugin):
 
 
 
-    @lightbulb.command(name="serverinfo", aliases=("guildinfo",))
+    @lightbulb.command(name="serverinfo", aliases=("guildinfo", "si"))
     async def command_severinfo(self, ctx: lightbulb.Context) -> None:
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
@@ -102,10 +105,8 @@ class Meta(lightbulb.Plugin):
 
         owner = guild.get_member(guild.owner_id)
 
-        channels = 0  
+        channels = len(guild.get_channels().values())  
         bots = 0
-        for channel in guild.get_channels().values():
-            channels += 1
               
         for member in guild.get_members().values():
             if member.is_bot:

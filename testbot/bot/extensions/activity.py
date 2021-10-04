@@ -52,8 +52,6 @@ class Activity(lightbulb.Plugin):
     async def command_poker(self, ctx: lightbulb.Context) -> None:
         await self.activity_app(ctx, 755827207812677713, "Poker", "https://cdn.discordapp.com/attachments/860628329362227251/893272821092986900/external-content.duckduckgo.com.jpg")
 
-
-
     @lightbulb.command(name="chess", aliases=("CH", "ch"))
     async def command_chess(self, ctx: lightbulb.Context) -> None:
         await self.activity_app(ctx, 832012774040141894, "Chess", "https://cdn.discordapp.com/attachments/860628329362227251/893271938439454800/images.png")
