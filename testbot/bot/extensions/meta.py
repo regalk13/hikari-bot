@@ -2,6 +2,7 @@ from os import RTLD_GLOBAL, replace
 import hikari
 from hikari.api.special_endpoints import ButtonBuilder
 from hikari.colors import Color
+from hikari.messages import ButtonStyle
 import lightbulb
 import datetime as dt
 from datetime import datetime, timedelta
@@ -211,7 +212,26 @@ class Meta(lightbulb.Plugin):
 
     @lightbulb.command(name="invite")
     async def command_invite(self, ctx: lightbulb.Context):
-        message = await ctx.respond("Working on this")
+        member = ctx.member
+        guild = await self.bot.rest.fetch_guild(member.guild_id)
+        bot = guild.get_my_member()
+        componetens_ = self.bot.rest.build_action_row() 
+        button = componetens_.add_button(ButtonStyle.LINK, f"https://discord.com/api/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot").set_label("Invite the bot").add_to_container()
+        
+        r_g = random.randint(1, 255)
+        r_b = random.randint(1, 255)
+        r_r = random.randint(1, 255)
+
+
+        embed = (hikari.Embed(
+            title="Bot invite",
+            colour=Color.from_rgb(r_g, r_b, r_r),
+            description="Click the button to invite the bot to your server."
+        )
+        .set_thumbnail(bot.avatar_url)
+        )
+        
+        await ctx.respond(embed, component=button)
                 
 
 

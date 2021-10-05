@@ -23,7 +23,7 @@ class Activity(lightbulb.Plugin):
         else:
             invite = await self.bot.rest.create_invite(target_application=_id, channel=voice_state.channel_id, target_type=2)
             embed = (hikari.Embed(
-                    title=f"{name}.",
+                    title=f"{name}",
                     colour=Color(0xBBFFBE),
                     description=f"Access to the activity by clicking [here.]({invite})",
                     timestamp=dt.datetime.now().astimezone()
