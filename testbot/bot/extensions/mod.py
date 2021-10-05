@@ -120,6 +120,12 @@ class Mod(lightbulb.Plugin):
         message = await ctx.respond(f"<a:Right:893842032248885249> slowmode of {seconds} second(s) applied.")
         await asyncio.sleep(5)
         await message.delete()
+
+
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_GUILD))
+    @lightbulb.command(name="lock", aliases=("lck",))
+    async def command_lock(self, ctx: lightbulb.Context):
+        await ctx.respond(f"<a:Right:893842032248885249> still working...")
     
 def load(bot: Bot) -> None:
     bot.add_plugin(Mod(bot))
