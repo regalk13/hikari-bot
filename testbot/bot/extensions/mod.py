@@ -5,6 +5,7 @@ import hikari
 from testbot.bot import Bot
 from hikari.colors import Color
 import datetime as dt
+from datetime import datetime, timedelta
 
 class Mod(lightbulb.Plugin):
     def __init__(self, bot: Bot):
@@ -90,22 +91,48 @@ class Mod(lightbulb.Plugin):
     @lightbulb.command(name="clear", aliases=("purge",))
     async def command_clear(self, ctx: lightbulb.Context, limit: int = 1):
 
-        if 0 < limit <= 500:
+        if 0 < limit <= 100:
+            if limit == 100:
+                limit = limit - 1
+
+
+
             channel = await self.bot.rest.fetch_channel(ctx.channel_id)
             message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
             await ctx.message.delete()
             messages_ = []
+            messages_dont = []
 
             async for messages in channel.fetch_history(before=ctx.timestamp).limit(limit):
-                    messages_.append(messages)
+                    time_between_insertion = ctx.timestamp - messages.created_at
+                    if time_between_insertion.days > 14:
+                        messages_dont.append(messages)
+                    else:
+                        messages_.append(messages)
 
-            await self.bot.rest.delete_messages(ctx.channel_id, messages_, ctx.message_id)
+            if len(messages_dont) > 1:
+                    messagess = await ctx.respond(f"<a:Wrong:893873540846198844> remember that I can only delete messages 14 days old, {len(messages_dont)} messages will be discarded.")
+                    await asyncio.sleep(4)
+                    await messagess.delete()
 
-            await message.delete()
-            message_ = await ctx.respond(f"<a:Right:893842032248885249> {limit} Message(s) deleted.")
-            await asyncio.sleep(5)
-            await message_.delete()
+            if len(messages_) > 1:
 
+                await self.bot.rest.delete_messages(ctx.channel_id, messages_, ctx.message_id)
+                await message.delete()
+                if limit == 100:
+                    message_ = await ctx.respond(f"<a:Right:893842032248885249> {len(messages_)+1} Message(s) deleted.")
+
+                message_ = await ctx.respond(f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+                await asyncio.sleep(5)
+                await message_.delete()
+            
+            else:
+                await message.delete() 
+                message_ = await ctx.respond(f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+                await asyncio.sleep(5)
+                await message_.delete()
+
+            
         else:
             await ctx.respond("<a:Wrong:893873540846198844> The number of messages you want to delete is not within the limits.")
 
