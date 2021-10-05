@@ -592,6 +592,22 @@ class Actions(lightbulb.Plugin):
         await self.action(ctx, f"**{ctx.member.username}** smuging.", gif)
 
 
+    @lightbulb.cooldown(4, 3, lightbulb.UserBucket)
+    @lightbulb.command(name="gns", aliases=("GNS",))
+    async def command_gns(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("guns-n-roses")
+
+        await self.action(ctx, f"**{ctx.member.username}** likes guns n roses.", gif)
+
+    @lightbulb.cooldown(4, 3, lightbulb.UserBucket)
+    @lightbulb.command(name="slipknot", aliases=("Slipknot",))
+    async def command_slipknot(self, ctx: lightbulb.Context) -> None:
+        gif = self.get_gif("slipknot")
+
+        await self.action(ctx, f"**{ctx.member.username}** likes slipknot.", gif)
+
+
+
     
 
 def load(bot: Bot) -> None:
