@@ -94,10 +94,12 @@ class Mod(lightbulb.Plugin):
             channel = await self.bot.rest.fetch_channel(ctx.channel_id)
             message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
             await ctx.message.delete()
-
+            messages_ = []
 
             async for messages in channel.fetch_history(before=ctx.timestamp).limit(limit):
-                await messages.delete()
+                    messages_.append(messages)
+
+            await self.bot.rest.delete_messages(ctx.channel_id, messages_, ctx.message_id)
 
             await message.delete()
             message_ = await ctx.respond(f"<a:Right:893842032248885249> {limit} Message(s) deleted.")

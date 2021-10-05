@@ -86,7 +86,6 @@ class Meta(lightbulb.Plugin):
 
         .add_field(name="<:Presence:893596200148811776> Presence", 
         value=activity_)
-        #.add_field(name="Roles", value=" | ".join(r.mention for r in reversed(target.role_ids[1:])))
         
         .set_thumbnail(target.avatar_url)
     )
