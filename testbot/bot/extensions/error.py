@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import lightbulb
+import wikipedia
 import hikari
 from lightbulb import plugins
 from testbot.bot import Bot
@@ -28,6 +29,10 @@ class ErrorHandler(lightbulb.Plugin):
         
         if isinstance(event.exception, lightbulb.errors.CheckFailure):
             return None
+
+        if isinstance(event.exception, wikipedia.exceptions.DisambiguationError):
+            return await event.context.respond("<a:Wrong:893873540846198844> try to be clearer with the search, multiple results found.")
+
 
         await event.context.respond("I have a error, please help me <:tiste:889343933304426536>")
         raise event.exception

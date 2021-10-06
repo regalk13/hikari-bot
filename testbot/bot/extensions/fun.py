@@ -1,10 +1,15 @@
 import lightbulb
 import random
 import hikari
+from lightbulb.converters import emoji_converter
+import wikipedia
 import requests
 from hikari.colors import Color
 
 import datetime as dt
+from wikipedia import exceptions
+
+from wikipedia.wikipedia import languages
 
 from testbot.bot import Bot
 
@@ -46,6 +51,52 @@ class Fun(lightbulb.Plugin):
     )
 
         await ctx.respond(embed=embed, reply=True)
+
+    @lightbulb.check(lightbulb.owner_only)
+    @lightbulb.command(name="wikilang", aliases=("wl",))
+    async def command_wikilang(self, ctx:lightbulb.Context, language) -> None:
+        global languages_
+        languages_ = language
+
+        await ctx.respond(f"<a:Right:893842032248885249> **{languages_}** language successfully changed")
+
+    @lightbulb.command(name="wikipedia", aliases=("wiki","wk"))
+    async def command_wikipedia(self, ctx: lightbulb.Context, *, search) -> None:
+        try:
+            message = await ctx.respond("<a:Loading:893842133792997406> Searching...")
+            wikipedia.set_lang(languages_)
+            page = wikipedia.page(search)
+            image = page.images[0]
+            title = page.title
+            content = page.content
+            if len(content) > 600:
+                content = content[:600] + "...(READ MORE click on the title)"
+
+            else:
+                content = content
+
+            title_link = title.replace(" ", "_")
+            embed = (hikari.Embed(
+                colour=Color(0x36393f),
+                description=content,
+                timestamp=dt.datetime.now().astimezone()
+
+            )
+            .set_image(image)
+            .set_author(name=title,url=f"https://{languages_}.wikipedia.org/wiki/{title_link}")
+            )
+
+            await ctx.respond(embed)
+            await message.delete()
+
+        except(wikipedia.exceptions.DisambiguationError):
+            await message.edit(content="<a:Wrong:893873540846198844> try to be clearer with the search, multiple results found.")
+
+        except(wikipedia.exceptions.PageError):
+            await message.edit(content="<a:Wrong:893873540846198844> page not found.")
+
+        except(wikipedia.exceptions.HTTPTimeoutError):
+            await message.edit(content="<a:Wrong:893873540846198844> the servers seem to be down try again later.")
 
 
 def load(bot: Bot) -> None:
