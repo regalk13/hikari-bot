@@ -1,6 +1,4 @@
-from os import RTLD_GLOBAL, replace
 import hikari
-from hikari.api.special_endpoints import ButtonBuilder
 from hikari.colors import Color
 from hikari.messages import ButtonStyle
 import lightbulb
@@ -10,8 +8,8 @@ from datetime import datetime, timedelta
 import psutil
 from testbot.bot import Bot
 import random 
-from platform import python_version
-from psutil import Process, cpu_times, virtual_memory
+from platform import libc_ver, python_version
+from psutil import Process, virtual_memory
 import typing as t
 class Meta(lightbulb.Plugin):
     def __init__(self, bot: Bot):
@@ -30,12 +28,16 @@ class Meta(lightbulb.Plugin):
         """Look at the information of a user, empty argument represents see your own info."""
         target = target or ctx.member
         roles = []
-        for role in target.get_roles():
+
+        for role in target.get_roles():    
             roles.append(role.mention)
+        
+        if len(roles) > 25:
+            u_roles = ", ".join(roles[:25])
 
-        u_roles = ", ".join(roles)
-    
-
+        else: 
+            u_roles = ", ".join(roles)
+        
         r_g = random.randint(1, 255)
         r_b = random.randint(1, 255)
         r_r = random.randint(1, 255)
@@ -83,7 +85,6 @@ class Meta(lightbulb.Plugin):
             value=u_roles
         ) 
 
-
         .add_field(name="<:Presence:893596200148811776> Presence", 
         value=activity_)
         
@@ -96,6 +97,7 @@ class Meta(lightbulb.Plugin):
 
     @lightbulb.command(name="serverinfo", aliases=("guildinfo", "si"))
     async def command_severinfo(self, ctx: lightbulb.Context) -> None:
+        """Look at the information of a server."""
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
 
@@ -142,6 +144,7 @@ class Meta(lightbulb.Plugin):
 
     @lightbulb.command(name="pfp", aliases=("picture"))
     async def command_pfp(self, ctx: lightbulb.Context, *, target: lightbulb.member_converter = None) -> None:
+        """Look at the profile picture of a user, empty argument represents see your own profile picture."""
         target = target or ctx.member
         image = target.avatar_url
 
@@ -155,10 +158,9 @@ class Meta(lightbulb.Plugin):
 
         await ctx.respond(embed=embed, reply=True)
 
-
-    #@lightbulb.cooldown(10, 1, lightbulb.UserBucket)
     @lightbulb.command(name="botinfo", aliases=("bi",))
     async def command_botinfo(self, ctx: lightbulb.Context) -> None:
+        """Look at the information of the bot."""
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
         guilds = self.bot.cache.get_guilds_view()
@@ -169,8 +171,6 @@ class Meta(lightbulb.Plugin):
             guild_ = await self.bot.rest.fetch_guild(user)
             for member in guild_.get_members().values():
                 members.append(member)
-
-
     
         r_g = random.randint(1, 255)
         r_b = random.randint(1, 255)
@@ -210,7 +210,8 @@ class Meta(lightbulb.Plugin):
 
 
     @lightbulb.command(name="invite")
-    async def command_invite(self, ctx: lightbulb.Context):
+    async def command_invite(self, ctx: lightbulb.Context) -> None:
+        """Invite the bot to your server."""
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
         bot = guild.get_my_member()
@@ -231,7 +232,27 @@ class Meta(lightbulb.Plugin):
         )
         
         await ctx.respond(embed, component=button)
-                
+
+    @lightbulb.command(name="jumbo", aliases=("jm",))
+    async def command_jumbo(self, ctx: lightbulb.Context, emote: lightbulb.emoji_converter):
+        image = emote.url
+
+        embed = (hikari.Embed(
+            title=f"{emote.name}",
+            colour=Color(0x36393f)
+        )
+        .set_image(image)
+        )
+
+
+        await ctx.respond(embed)
+
+
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.CHANGE_NICKNAME))
+    @lightbulb.command(name="nickname", aliases=("nick",))
+    async def command_nickname(self, ctx: lightbulb.Context, nickname) -> None:
+        
+        await ctx.member.edit(nick=nickname)
 
 
 

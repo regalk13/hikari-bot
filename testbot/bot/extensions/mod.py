@@ -95,11 +95,8 @@ class Mod(lightbulb.Plugin):
             if limit == 100:
                 limit = limit - 1
 
-
-
             channel = await self.bot.rest.fetch_channel(ctx.channel_id)
             message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
-            await ctx.message.delete()
             messages_ = []
             messages_dont = []
 
@@ -111,26 +108,22 @@ class Mod(lightbulb.Plugin):
                         messages_.append(messages)
 
             if len(messages_dont) > 1:
-                    messagess = await ctx.respond(f"<a:Wrong:893873540846198844> remember that I can only delete messages 14 days old, {len(messages_dont)} messages will be discarded.")
-                    await asyncio.sleep(4)
-                    await messagess.delete()
+                    await message.edit(content=f"<a:Wrong:893873540846198844> remember that I can only delete messages 14 days old, {len(messages_dont)} messages will be discarded.")
+                    await asyncio.sleep(5)
 
             if len(messages_) > 1:
-
                 await self.bot.rest.delete_messages(ctx.channel_id, messages_, ctx.message_id)
-                await message.delete()
                 if limit == 100:
-                    message_ = await ctx.respond(f"<a:Right:893842032248885249> {len(messages_)+1} Message(s) deleted.")
+                    await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)+1} Message(s) deleted.")
 
-                message_ = await ctx.respond(f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+                await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
                 await asyncio.sleep(5)
-                await message_.delete()
+                await message.delete()
             
             else:
-                await message.delete() 
-                message_ = await ctx.respond(f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+                await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
                 await asyncio.sleep(5)
-                await message_.delete()
+                await message.delete()
 
             
         else:

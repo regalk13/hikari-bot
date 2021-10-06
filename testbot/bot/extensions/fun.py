@@ -26,9 +26,9 @@ class Fun(lightbulb.Plugin):
 
     @lightbulb.command(name="say")
     async def command_say(self, ctx: lightbulb.Context, *, text: str) -> None:
-        print(text)
-
-        await ctx.respond(f"``{text}``")
+        
+        await ctx.message.delete()
+        await ctx.respond(f"{text}")
 
     @lightbulb.command(name="cat", aliases=("gato",))
     async def command_cat(self, ctx: lightbulb.Context) -> None:
