@@ -1,3 +1,4 @@
+from math import trunc
 import lightbulb
 import random
 import hikari
@@ -64,7 +65,9 @@ class Fun(lightbulb.Plugin):
     async def command_wikipedia(self, ctx: lightbulb.Context, *, search) -> None:
         try:
             message = await ctx.respond("<a:Loading:893842133792997406> Searching...")
+               
             wikipedia.set_lang(languages_)
+
             page = wikipedia.page(search)
             image = page.images[0]
             title = page.title
@@ -86,7 +89,7 @@ class Fun(lightbulb.Plugin):
             .set_author(name=title,url=f"https://{languages_}.wikipedia.org/wiki/{title_link}")
             )
 
-            await ctx.respond(embed)
+            await ctx.respond(embed, reply=True)
             await message.delete()
 
         except(wikipedia.exceptions.DisambiguationError):

@@ -1,5 +1,7 @@
 import asyncio
 import logging
+from hikari import PermissionOverwrite, PermissionOverwriteType
+from hikari.permissions import Permissions
 import lightbulb
 import hikari 
 from testbot.bot import Bot
@@ -130,22 +132,101 @@ class Mod(lightbulb.Plugin):
             await ctx.respond("<a:Wrong:893873540846198844> The number of messages you want to delete is not within the limits.")
 
 
-    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_GUILD))
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
     @lightbulb.command(name="slowmode", aliases=("sm",))
-    async def command_slowmode(self, ctx: lightbulb.Context, seconds: int = 1):
+    async def command_slowmode(self, ctx: lightbulb.Context, time):
         member = ctx.member
         guild = await self.bot.rest.fetch_guild(member.guild_id)
         channel = guild.get_channel(ctx.channel_id)
-        await channel.edit(rate_limit_per_user=seconds)
-        message = await ctx.respond(f"<a:Right:893842032248885249> slowmode of {seconds} second(s) applied.")
+
+        time_converter = list(time)
+        time_ = 0
+
+        if len(time_converter) >= 2: 
+
+            if time_converter[1] == "s":
+                time_ = int(time_converter[0])
+                message = await ctx.respond(f"<a:Right:893842032248885249> slowmode of {time} applied.")
+
+
+            elif time_converter[1] == "m":
+                time_ = int(time_converter[0]) * 60
+                message = await ctx.respond(f"<a:Right:893842032248885249> slowmode of {time} applied.")
+
+
+            elif time_converter[1] == "h":
+                time_ = int(time_converter[0]) * 3600
+                message = await ctx.respond(f"<a:Right:893842032248885249> slowmode of {time} applied.")
+
+            else:
+                message = await ctx.respond("``Valid format: (time)s, (time)m, (time)h``")   
+
+        else:
+            message = await ctx.respond("``Valid format: (time)s, (time)m, (time)h``")     
+
+
+        await channel.edit(rate_limit_per_user=int(time_))
         await asyncio.sleep(5)
         await message.delete()
 
 
-    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_GUILD))
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
     @lightbulb.command(name="lock", aliases=("lck",))
     async def command_lock(self, ctx: lightbulb.Context):
-        await ctx.respond(f"<a:Right:893842032248885249> still working...")
+        member = ctx.member
+        guild = await self.bot.rest.fetch_guild(member.guild_id)
+        channel_ = guild.get_channel(ctx.channel_id)
+
+        id_role = ""
+        for role in member.get_roles():
+            if role.name == "@everyone":
+                id_role = role.id
+
+
+        await self.bot.rest.edit_permission_overwrites(
+            channel = channel_,
+            target_type = PermissionOverwriteType.ROLE,
+            target=id_role,
+            allow=(
+            Permissions.VIEW_CHANNEL
+            | Permissions.READ_MESSAGE_HISTORY
+            ),
+            deny=(
+            Permissions.VIEW_CHANNEL
+            | Permissions.SEND_MESSAGES
+            )
+        )    
+        await ctx.respond(f"<a:Right:893842032248885249> channel locked...")
+
+
+    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
+    @lightbulb.command(name="unlock", aliases=("ulck",))
+    async def command_unlock(self, ctx: lightbulb.Context):
+        member = ctx.member
+        guild = await self.bot.rest.fetch_guild(member.guild_id)
+        channel_ = guild.get_channel(ctx.channel_id)
+
+        id_role = ""
+        for role in member.get_roles():
+            if role.name == "@everyone":
+                id_role = role.id
+
+
+        await self.bot.rest.edit_permission_overwrites(
+            channel = channel_,
+            target_type = PermissionOverwriteType.ROLE,
+            target=id_role,
+            allow=(
+            Permissions.VIEW_CHANNEL
+            | Permissions.READ_MESSAGE_HISTORY
+            | Permissions.SEND_MESSAGES
+            ),
+            deny=(
+            Permissions.MANAGE_MESSAGES
+            | Permissions.SPEAK
+            )
+        )    
+        await ctx.respond(f"<a:Right:893842032248885249> channel unlocked...")
     
 def load(bot: Bot) -> None:
     bot.add_plugin(Mod(bot))
