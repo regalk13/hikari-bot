@@ -169,36 +169,6 @@ class Mod(lightbulb.Plugin):
         await asyncio.sleep(5)
         await message.delete()
 
-
-    @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
-    @lightbulb.command(name="lock", aliases=("lck",))
-    async def command_lock(self, ctx: lightbulb.Context):
-        member = ctx.member
-        guild = await self.bot.rest.fetch_guild(member.guild_id)
-        channel_ = guild.get_channel(ctx.channel_id)
-
-        id_role = ""
-        for role in member.get_roles():
-            if role.name == "@everyone":
-                id_role = role.id
-
-
-        await self.bot.rest.edit_permission_overwrites(
-            channel = channel_,
-            target_type = PermissionOverwriteType.ROLE,
-            target=id_role,
-            allow=(
-            Permissions.VIEW_CHANNEL
-            | Permissions.READ_MESSAGE_HISTORY
-            ),
-            deny=(
-            Permissions.VIEW_CHANNEL
-            | Permissions.SEND_MESSAGES
-            )
-        )    
-        await ctx.respond(f"<a:Right:893842032248885249> channel locked...")
-
-
     @lightbulb.check(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
     @lightbulb.command(name="unlock", aliases=("ulck",))
     async def command_unlock(self, ctx: lightbulb.Context):

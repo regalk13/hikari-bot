@@ -37,14 +37,15 @@ class Bot(lightbulb.Bot):
 
     def run(self) -> None:
         self.event_manager.subscribe(hikari.StartingEvent, self.on_starting)
-        self.event_manager.subscribe(hikari.StartedEvent, self.on_started)
         self.event_manager.subscribe(hikari.StoppingEvent, self.on_stopping)
+        self.event_manager.subscribe(hikari.StartedEvent, self.on_started)
         
         super().run(
             activity=hikari.Activity(
                 name=f"-help | Version {__version__}", 
-                type=hikari.ActivityType.WATCHING
-            )
+                type=hikari.ActivityType.WATCHING,
+            ),
+            status='idle'
         )
 
     async def close(self) -> None:
