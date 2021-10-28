@@ -4,23 +4,24 @@ from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 
+
+import os
 import hikari
 import lightbulb
 import logging
 
-from testbot import __version__, STDOUT_CHANNEL_ID
 
 
 
 
 class Bot(lightbulb.Bot):
     def __init__(self) -> None:
-        self._extensions = [p.stem for p in Path("./testbot/bot/extensions/").glob("*.py")]
+        self._extensions = [p.stem for p in Path(".").glob("./testbot/bot/extensions/*.py")]
         self.scheduler = AsyncIOScheduler()
         self.scheduler.configure(timezone=utc)
 
-        with open("./secrets/token", mode="r", encoding="utf-8") as f:
-            token = f.read()
+        with open("./secrets/token") as f:
+            token = f.read().strip("\n")
 
         super().__init__(
             prefix="-",
@@ -42,35 +43,29 @@ class Bot(lightbulb.Bot):
         
         super().run(
             activity=hikari.Activity(
-                name=f"-help | Version {__version__}", 
+                name=f"-help | Version idk", 
                 type=hikari.ActivityType.WATCHING,
             ),
             status='idle'
         )
 
     async def close(self) -> None:
-        await self.stdout_channel.send(f"Testing v{__version__} is shutting now :(") 
+        await self.stdout_channel.send(f"Testing v is shutting now :(") 
         await super().close()
 
 
 
-    async def on_starting(self, event: hikari.StartingEvent) -> None:
-        print(self._extensions)
-        for ext in self._extensions:
-            self.load_extension(f"testbot.bot.extensions.{ext}")
-            logging.info(f"{ext} extension loaded")
+    async def on_starting(self, event: hikari.StartingEvent) -> None: 
+        self.load_extensions_from(path="./testbot/bot/extensions/", must_exist=True)
+
 
     async def on_started(self, event: hikari.StartedEvent) -> None:
         self.scheduler.start()
         self.add_check(self.guild_only)
-        self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
-        await self.stdout_channel.send(f"Testing v{__version__} now online!") 
-
+        #self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
+        #await self.stdout_channel.send(f"Testing vme rompi xd ayuda now online!") 
+         
         logging.info("BOT READY!!!")
 
     async def on_stopping(self, event: hikari.StoppingEvent) -> None:
         self.scheduler.shutdown()
-
-
-
-
