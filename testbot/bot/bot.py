@@ -4,17 +4,12 @@ from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 
-
 import os
 import hikari
 import lightbulb
 import logging
 
-
-
-
-
-class Bot(lightbulb.Bot):
+class Bot(lightbulb.BotApp):
     def __init__(self) -> None:
         self._extensions = [p.stem for p in Path(".").glob("./testbot/bot/extensions/*.py")]
         self.scheduler = AsyncIOScheduler()
@@ -25,7 +20,6 @@ class Bot(lightbulb.Bot):
 
         super().__init__(
             prefix="-",
-            insensitive_commands=True,
             token=token,
             intents=hikari.Intents.ALL,
         ) 
@@ -53,15 +47,13 @@ class Bot(lightbulb.Bot):
         await self.stdout_channel.send(f"Testing v is shutting now :(") 
         await super().close()
 
-
-
     async def on_starting(self, event: hikari.StartingEvent) -> None: 
-        self.load_extensions_from(path="./testbot/bot/extensions/", must_exist=True)
+        self.load_extensions_from("./testbot/bot/extensions/", must_exist=True)
 
 
     async def on_started(self, event: hikari.StartedEvent) -> None:
         self.scheduler.start()
-        self.add_check(self.guild_only)
+        #self.add_check(self.guild_only)
         #self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
         #await self.stdout_channel.send(f"Testing vme rompi xd ayuda now online!") 
          

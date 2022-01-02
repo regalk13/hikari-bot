@@ -2,3 +2,4 @@ secrets/
 .venv/
 token
 __pycache__/
+backuo/
