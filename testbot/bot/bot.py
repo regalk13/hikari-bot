@@ -37,7 +37,7 @@ class Bot(lightbulb.BotApp):
         
         super().run(
             activity=hikari.Activity(
-                name=f"-help | Version idk", 
+                name=f"-help | Version 2.0", 
                 type=hikari.ActivityType.WATCHING,
             ),
             status='idle'
@@ -54,8 +54,8 @@ class Bot(lightbulb.BotApp):
     async def on_started(self, event: hikari.StartedEvent) -> None:
         self.scheduler.start()
         #self.add_check(self.guild_only)
-        #self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
-        #await self.stdout_channel.send(f"Testing vme rompi xd ayuda now online!") 
+        self.stdout_channel = await self.rest.fetch_channel(887515478304624730)
+        #await self.stdout_channel.send(f"Testing v2.0 now online!") 
          
         logging.info("BOT READY!!!")
 
