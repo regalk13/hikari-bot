@@ -4,60 +4,92 @@ from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 
+from hikari.events.base_events import FailedEventT
 import os
 import hikari
 import lightbulb
 import logging
 
-class Bot(lightbulb.BotApp):
-    def __init__(self) -> None:
-        self._extensions = [p.stem for p in Path(".").glob("./testbot/bot/extensions/*.py")]
-        self.scheduler = AsyncIOScheduler()
-        self.scheduler.configure(timezone=utc)
+   
+with open("./secrets/token") as f:
+    token = f.read().strip("\n")
 
-        with open("./secrets/token") as f:
-            token = f.read().strip("\n")
+bot = lightbulb.BotApp(
+        prefix="-",
+        token=token,
+        help_slash_command=True,
+        default_enabled_guilds=862093766646169609,
+        case_insensitive_prefix_commands=True,
+        intents=hikari.Intents.ALL,
+) 
 
-        super().__init__(
-            prefix="-",
-            token=token,
-            intents=hikari.Intents.ALL,
-        ) 
-
-
-    @staticmethod
-    async def guild_only(message: hikari.Message) -> bool:
-        return message.guild_id is not None
+bot.load_extensions_from("./testbot/bot/extensions", must_exist=True)
+bot.d.scheduler = AsyncIOScheduler()
+bot.d.scheduler.configure(timezone=utc)
 
 
-    def run(self) -> None:
-        self.event_manager.subscribe(hikari.StartingEvent, self.on_starting)
-        self.event_manager.subscribe(hikari.StoppingEvent, self.on_stopping)
-        self.event_manager.subscribe(hikari.StartedEvent, self.on_started)
-        
-        super().run(
-            activity=hikari.Activity(
-                name=f"-help | Version 2.0", 
-                type=hikari.ActivityType.WATCHING,
-            ),
-            status='idle'
-        )
+@bot.listen(hikari.StartingEvent)
+async def on_starting(_: hikari.StartingEvent) -> None: 
+    bot.d.scheduler.start()
 
-    async def close(self) -> None:
-        await self.stdout_channel.send(f"Testing v is shutting now :(") 
-        await super().close()
-
-    async def on_starting(self, event: hikari.StartingEvent) -> None: 
-        self.load_extensions_from("./testbot/bot/extensions/", must_exist=True)
-
-
-    async def on_started(self, event: hikari.StartedEvent) -> None:
-        self.scheduler.start()
-        #self.add_check(self.guild_only)
-        self.stdout_channel = await self.rest.fetch_channel(887515478304624730)
-        #await self.stdout_channel.send(f"Testing v2.0 now online!") 
+@bot.listen(hikari.StartedEvent)
+async def on_started(_: hikari.StartedEvent) -> None:
+    #self.add_check(self.guild_only)
+    stdout_channel = await bot.rest.fetch_channel(887515478304624730)
+    #await stdout_channel.send(f"Testing v2.0 now online!") 
          
-        logging.info("BOT READY!!!")
+    logging.info("BOT READY!!!")
 
-    async def on_stopping(self, event: hikari.StoppingEvent) -> None:
-        self.scheduler.shutdown()
+@bot.listen(hikari.StoppingEvent)
+async def on_stopping(event: hikari.StoppingEvent) -> None:
+    bot.d.scheduler.shutdown() 
+    #await bot.d.stdout_channel.send(f"Testing v is shutting now :(") 
+
+
+@bot.listen(hikari.DMMessageCreateEvent)
+async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
+    if event.message.author.is_bot:
+        return
+
+    await event.message.respond(
+        f"The function of modmail is being carried out."
+    )
+
+
+@bot.listen(hikari.ExceptionEvent)
+async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
+    raise event.exception
+
+@bot.listen(lightbulb.CommandErrorEvent)
+async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
+    exc = getattr(event.exception, "__cause__", event.exception)
+
+    if isinstance(exc, lightbulb.NotOwner):
+        await event.context.respond("You need to be an owner to do that.")
+        return
+
+    elif isinstance(exc, lightbulb.NotEnoughArguments):
+        await event.context.respond("<a:Warn:893874049967595550> Some arguments are missing: "+ ", ".join(event.exception.missing_args))
+        return
+
+    if isinstance(event.exception, lightbulb.errors.CommandIsOnCooldown):
+        return await event.context.respond(f"<a:Warn:893874049967595550> Command is on cooldown. Try again in {event.exception.retry_in:.0f} second(s).")
+
+    if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
+        return await event.context.respond("<a:Wrong:893873540846198844> You don't have the required permissions for this action.")
+        
+    if isinstance(event.exception, lightbulb.errors.CheckFailure):
+        return None
+
+def run() -> None:
+    if os.name != "nt":
+        import uvloop
+
+        uvloop.install()
+
+    bot.run(
+        activity=hikari.Activity(
+            name=f"/help • Version 2.0",
+            type=hikari.ActivityType.WATCHING,
+        )
+    )

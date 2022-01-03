@@ -2,7 +2,6 @@ import lightbulb
 import hikari
 import requests
 from hikari.colors import Color
-from testbot.bot import Bot
 import random
 import json
 
@@ -268,9 +267,8 @@ async def command_kiss(ctx: lightbulb.context):
 
 
 
-
-def load(bot: Bot) -> None:
+def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)
 
-def unload(bot: Bot) -> None:
+def unload(bot: lightbulb.BotApp) -> None:
     bot.remove_plugin(plugin)

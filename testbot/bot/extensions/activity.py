@@ -2,7 +2,6 @@ import lightbulb
 import hikari
 import datetime as dt
 
-from testbot.bot import Bot
 from hikari.colors import Color
 
 plugin = lightbulb.Plugin(name="Activity", description="Create and join in game activities of Discord Game Labs.")
@@ -44,10 +43,8 @@ async def activity_app(ctx, _id, name, image):
 # async def command_youtube(ctx: lightbulb.Context,) -> None:
 #    await activity_app(ctx, 755600276941176913, "Youtube", "https://cdn.discordapp.com/attachments/860628329362227251/893273830158639125/youtube.png")
 
-
-
-def load(bot: Bot) -> None:
+def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)
 
-def unload(bot: Bot) -> None:
+def unload(bot: lightbulb.BotApp) -> None:
     bot.remove_plugin(plugin)

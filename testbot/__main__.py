@@ -1,13 +1,4 @@
-from testbot import __version__
-from testbot.bot import Bot
+from testbot.bot import bot
 
-import os
-
-if os.name != "nt":
-    import uvloop
-    uvloop.install()
-
-
-if __name__ == '__main__':
-    bot = Bot()
+if __name__ == "__main__":
     bot.run()
