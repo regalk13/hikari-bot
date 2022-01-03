@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
 
