@@ -17,7 +17,7 @@ bot = lightbulb.BotApp(
         prefix="-",
         token=token,
         help_slash_command=True,
-        default_enabled_guilds=862093766646169609,
+        default_enabled_guilds=(862093766646169609, 798708207668297749),
         case_insensitive_prefix_commands=True,
         intents=hikari.Intents.ALL,
 ) 

@@ -91,6 +91,46 @@ async def command_wikipedia(ctx: lightbulb.SlashContext) -> None:
     except(wikipedia.exceptions.HTTPTimeoutError):
         await message.edit(content="<a:Wrong:893873540846198844> the servers seem to be down try again later.")
 
+@plugin.command
+@lightbulb.set_help("Search in te PEP of python.")
+@lightbulb.option("number", "The PEP number to search for.")
+@lightbulb.command("pep", "Retrieve info on a Python Extension Protocol.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_pep(ctx: lightbulb.SlashContext) -> None:
+    n = ctx.options.number
+    url = f"https://python.org/dev/peps/pep-{n:>04}"
+
+    await ctx.respond(f"PEP {n:>04}: <{url}>")
+
+@plugin.command
+@lightbulb.set_help("Search something using Google.")
+@lightbulb.option("query", "The thing to search.")
+@lightbulb.command("google", "Let me Google that for you...")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_google(ctx: lightbulb.SlashContext) -> None:
+    q = ctx.options.query
+
+    if len(q) > 500:
+        await ctx.respond("Your query should be no longer than 500 characters.")
+        return
+
+    await ctx.respond(f"<https://letmegooglethat.com/?q={q.replace(' ', '+')}>")
+
+
+@plugin.command
+@lightbulb.set_help("Search something using Duck Duck Go.")
+@lightbulb.option("query", "The thing to search.")
+@lightbulb.command("duckduckgo", "Let me Duck Duck Go that for you...")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_duckduckgo(ctx: lightbulb.SlashContext) -> None:
+    q = ctx.options.query
+
+    if len(q) > 500:
+        await ctx.respond("Your query should be no longer than 500 characters.")
+        return
+
+    await ctx.respond(f"<https://lmddgtfy.net/?q={q.replace(' ', '+')}>")
+
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

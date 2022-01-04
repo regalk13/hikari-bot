@@ -29,6 +29,8 @@ async def command_ping(ctx: lightbulb.SlashContext) -> None:
 async def command_userinfo(ctx: lightbulb.SlashContext) -> None:
     target = ctx.options.target or ctx.member
     roles = []
+    fetch_target = await plugin.bot.rest.fetch_user(target.id)
+
 
     for role in target.get_roles():    
         roles.append(role.mention)
@@ -60,13 +62,15 @@ async def command_userinfo(ctx: lightbulb.SlashContext) -> None:
 
 
             activity_ = ', '.join(activitys)
-    
+    accent_colour = str(fetch_target.accent_color)[1:]
+
     embed = (hikari.Embed(
         title="User information",
         description=f"Displaying information for {target.mention}",
         colour=Color.from_rgb(r_r, r_b, r_g),
         timestamp=dt.datetime.now().astimezone()
     )
+    .set_image(fetch_target.banner_url or f"https://singlecolorimage.com/get/{accent_colour}/400x100")
     .set_author(name="Information")
     .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.member.avatar_url)
     .add_field(name="<:ID:893578566296555520>", value=target.id)
@@ -80,17 +84,16 @@ async def command_userinfo(ctx: lightbulb.SlashContext) -> None:
         value=getattr(target.premium_since, "strftime", lambda x: "Not boosting")("%d %b %Y"),
         inline=True
     )       
-
     .add_field(
         name="<:Info:893583131536412772> Roles",
         value=u_roles
     ) 
-
     .add_field(name="<:Presence:893596200148811776> Presence", 
         value=activity_)   
     .set_thumbnail(target.avatar_url)
     )
-    
+  
+
     await ctx.respond(embed=embed, reply=True)
 
 
