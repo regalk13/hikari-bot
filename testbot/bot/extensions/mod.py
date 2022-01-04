@@ -102,19 +102,41 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command(name="clear", aliases=("purge",), description="Clear messages")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def purge(ctx: lightbulb.SlashContext):
-    if ctx.options.amount < 2:
+    if ctx.options.limit < 2:
         return await ctx.respond("I cant purge less then 2 messages >:(")
-    elif ctx.options.amount > 100:
+    elif ctx.options.limit > 100:
         return await ctx.respond("I cant purge more the 100 messages!")
     #if not ctx.option.user:
-    channel = await plugin.bot.rest.fetch_channel(ctx.channel_id)
+    message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
+    messages_ = []
+    messages_dont = []
 
-    async for messages in channel.fetch_history(before=ctx.timestamp).limit(ctx.options.limit):
-        print(messages)
+    async for messages in plugin.bot.rest.fetch_messages(channel=ctx.channel_id, before=datetime.now().astimezone()).limit(ctx.options.limit):
+        time_between_insertion = datetime.now().astimezone() - messages.created_at
+        if time_between_insertion.days > 14:
+            messages_dont.append(messages)
+        else:
+            messages_.append(messages)
 
+    
+    if len(messages_dont) > 1:
+        await message.edit(content=f"<a:Wrong:893873540846198844> remember that I can only delete messages 14 days old, {len(messages_dont)} messages will be discarded.")
+        await asyncio.sleep(5)
 
+    if len(messages_) > 1:
+        await plugin.bot.rest.delete_messages(ctx.channel_id, messages_)
+        if ctx.options.limit == 100:
+            await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)+1} Message(s) deleted.")
 
-    await ctx.respond("<a:Right:893842032248885249> {len(messages_)} Message(s) deleted")
+        await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+        await asyncio.sleep(5)
+        await message.delete()
+            
+    else:
+        await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+        await asyncio.sleep(5)
+        await message.delete()
+
     #else:
     #    def purge_type(m):
     #        return m.author == ctx.option.user
@@ -166,9 +188,9 @@ async def command_slowmode(ctx: lightbulb.SlashContext):
     await message.delete()
 
 @plugin.command
-@lightbulb.set_help("Lock the channel, just roles with admin persmissions can use the channel.")
+@lightbulb.set_help("Unlock the channel, everyone can use the channel then.")
 @lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
-@lightbulb.command(name="unlock", aliases=("ulck",), description="Lock the channel for moderation.")
+@lightbulb.command(name="unlock", aliases=("ulck",), description="Unlock to everyone.")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_unlock(ctx: lightbulb.SlashContext):
     member = ctx.member
@@ -197,6 +219,43 @@ async def command_unlock(ctx: lightbulb.SlashContext):
     )    
     await ctx.respond(f"<a:Right:893842032248885249> channel unlocked...")
     
+
+
+@plugin.command
+@lightbulb.set_help("Lock the channel, just roles with admin persmissions can use the channel.")
+@lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
+@lightbulb.command(name="lock", aliases=("lck",), description="Lock the channel for moderation.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def command_lock(ctx: lightbulb.SlashContext):
+    member = ctx.member
+    guild = await plugin.bot.rest.fetch_guild(member.guild_id)
+    channel_ = guild.get_channel(ctx.channel_id)
+
+    id_role = ""
+    for role in member.get_roles():
+        if role.name == "@everyone":
+            id_role = role.id
+
+
+    await plugin.bot.rest.edit_permission_overwrites(
+        channel = channel_,
+        target_type = PermissionOverwriteType.ROLE,
+        target=id_role,
+        allow=(
+        Permissions.VIEW_CHANNEL
+        | Permissions.READ_MESSAGE_HISTORY
+        ),
+        deny=(
+        Permissions.MANAGE_MESSAGES
+        | Permissions.SPEAK
+        | Permissions.SEND_MESSAGES
+        )
+    )    
+    await ctx.respond(f"🔒 channel locked.")
+
+
+
+
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)
 

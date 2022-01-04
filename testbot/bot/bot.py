@@ -55,30 +55,30 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
     )
 
 
-@bot.listen(hikari.ExceptionEvent)
-async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
-    raise event.exception
+#@bot.listen(hikari.ExceptionEvent)
+#async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
+#    raise event.exception
 
-@bot.listen(lightbulb.CommandErrorEvent)
-async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
-    exc = getattr(event.exception, "__cause__", event.exception)
+#@bot.listen(lightbulb.CommandErrorEvent)
+#async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
+#    exc = getattr(event.exception, "__cause__", event.exception)
 
-    if isinstance(exc, lightbulb.NotOwner):
-        await event.context.respond("You need to be an owner to do that.")
-        return
+#    if isinstance(exc, lightbulb.NotOwner):
+#        await event.context.respond("You need to be an owner to do that.")
+#        return
 
-    elif isinstance(exc, lightbulb.NotEnoughArguments):
-        await event.context.respond("<a:Warn:893874049967595550> Some arguments are missing: "+ ", ".join(event.exception.missing_args))
-        return
+#    elif isinstance(exc, lightbulb.NotEnoughArguments):
+#        await event.context.respond("<a:Warn:893874049967595550> Some arguments are missing: "+ ", ".join(event.exception.missing_args))
+#        return
 
-    if isinstance(event.exception, lightbulb.errors.CommandIsOnCooldown):
-        return await event.context.respond(f"<a:Warn:893874049967595550> Command is on cooldown. Try again in {event.exception.retry_in:.0f} second(s).")
+#    if isinstance(event.exception, lightbulb.errors.CommandIsOnCooldown):
+#        return await event.context.respond(f"<a:Warn:893874049967595550> Command is on cooldown. Try again in {event.exception.retry_in:.0f} second(s).")
 
-    if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
-        return await event.context.respond("<a:Wrong:893873540846198844> You don't have the required permissions for this action.")
+#    if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
+#        return await event.context.respond("<a:Wrong:893873540846198844> You don't have the required permissions for this action.")
         
-    if isinstance(event.exception, lightbulb.errors.CheckFailure):
-        return None
+#    if isinstance(event.exception, lightbulb.errors.CheckFailure):
+#        return None
 
 def run() -> None:
     if os.name != "nt":
