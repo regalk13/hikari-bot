@@ -161,6 +161,7 @@ async def command_pfp(ctx: lightbulb.SlashContext) -> None:
     )
     .set_author(name=f"{target.username}#{target.discriminator}", icon=target.avatar_url)
     .set_image(image)
+
     )
 
     await ctx.respond(embed=embed, reply=True)
