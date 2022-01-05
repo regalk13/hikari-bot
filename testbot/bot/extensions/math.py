@@ -1,3 +1,4 @@
+from lightbulb import decorators
 from lightbulb.utils.search import get
 import wolframalpha
 import lightbulb
@@ -11,7 +12,7 @@ plugin = lightbulb.Plugin(name="Math", description="Lows and advanced maths comm
 
 
 app_id = 'API-KEY'
-# search on wolfram website your api key
+# Search on wolfram website your api-key
 app = wolfram.App(app_id)
    
 
@@ -79,6 +80,21 @@ async def command_c(ctx: lightbulb.SlashContext):
     await ctx.respond(f"Result of {equation} is '{result}'.\n")
     await ctx.respond(f"> Possible steps to solution:\n\n{steps}")
 
+
+
+@plugin.command
+@lightbulb.set_help("Convert a plain text to LaTeX")
+@lightbulb.option("expression", "Math expression to convert")
+@lightbulb.command(name="f", aliases=("Lat",), description="Convert math expression to LaTeX")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def command_latex(ctx: lightbulb.SlashContext):
+    embed = (hikari.Embed(
+        color=Color(0x36393f),
+    )
+    .set_image("https://latex.codecogs.com/png.image?\dpi{190}&space;" + str(ctx.options.expression))
+    )
+
+    await ctx.respond(embed)
 
 
 

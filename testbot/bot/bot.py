@@ -61,15 +61,15 @@ async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
 
 @bot.listen(lightbulb.CommandErrorEvent)
 async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
-    exc = getattr(event.exception, "__cause__", event.exception)
+    if isinstance(event.exception, lightbulb.errors.CommandNotFound):
+        return None
 
-    if isinstance(exc, lightbulb.NotOwner):
-        await event.context.respond("You need to be an owner to do that.")
-        return
+    if isinstance(event.exception, lightbulb.errors.NotEnoughArguments):
+        return await event.context.respond("<a:Warn:893874049967595550> Some arguments are missing: "+ ", ".join(event.exception.missing_args))
 
-    elif isinstance(exc, lightbulb.NotEnoughArguments):
-        await event.context.respond("<a:Warn:893874049967595550> Some arguments are missing: "+ ", ".join(event.exception.missing_args))
-        return
+
+    if isinstance(event.exception, lightbulb.errors.NotEnoughArguments):
+        return await event.context.respond("<a:Warn:893874049967595550> Too many arguments were passed.")
 
     if isinstance(event.exception, lightbulb.errors.CommandIsOnCooldown):
         return await event.context.respond(f"<a:Warn:893874049967595550> Command is on cooldown. Try again in {event.exception.retry_in:.0f} second(s).")
@@ -79,6 +79,10 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
         
     if isinstance(event.exception, lightbulb.errors.CheckFailure):
         return None
+
+    await event.context.respond("I have a error, please help me <:tiste:889343933304426536>")
+    raise event.exception
+
 
 def run() -> None:
     if os.name != "nt":
