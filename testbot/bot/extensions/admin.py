@@ -11,7 +11,7 @@ plugin = lightbulb.Plugin(name="Admin", description="Commands just the owner of 
 @lightbulb.add_checks(lightbulb.owner_only)
 @lightbulb.set_help("Just the admin of the bot can shutdown the bot.")
 @lightbulb.command(name="shutdown", aliases=("sd",), description="Shutdown the bot.")
-@lightbulb.implements(lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def command_shutdown(ctx: lightbulb.Context) -> None:
     await ctx.bot.close()
 
@@ -49,7 +49,7 @@ async def handle_extensions(ctx: lightbulb.Context, extensions: str, action: str
 @lightbulb.set_help("Reload all extensions or add the name of just a extension.")
 @lightbulb.option("extensions", "extensions you want to reload", required=False)
 @lightbulb.command(name="reload", description="Reload the extensions")
-@lightbulb.implements(lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def command_reload(ctx: lightbulb.Context) -> None:
     await handle_extensions(ctx, ctx.options.extensions, "reload")
         
@@ -59,7 +59,7 @@ async def command_reload(ctx: lightbulb.Context) -> None:
 @lightbulb.set_help("Unload all extensions or add the name of just a extension.")
 @lightbulb.option("extensions", "extensions you want to unload", required=False)
 @lightbulb.command(name="unload", description="Unload the extensions")
-@lightbulb.implements(lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def command_unload(ctx: lightbulb.Context) -> None:
     await handle_extensions(ctx, ctx.options.extensions, "unload")
 
@@ -68,9 +68,20 @@ async def command_unload(ctx: lightbulb.Context) -> None:
 @lightbulb.set_help("Load the extensions or add the name of just a extension.")
 @lightbulb.option("extensions", "extensions you want to load", required=False)
 @lightbulb.command(name="load", description="Load the extensions")
-@lightbulb.implements(lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def command_load(ctx: lightbulb.Context) -> None:
     await handle_extensions(ctx, ctx.options.extensions, "load")
+
+@plugin.command
+@lightbulb.add_checks(lightbulb.owner_only)
+@lightbulb.set_help("Eval python code")
+@lightbulb.option("query", "Query to run.")
+@lightbulb.command(name="eval", description="Run python code.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def command_eval(ctx: lightbulb.SlashContext) -> None:
+    result = eval(ctx.options.query)
+    await ctx.respond(f"```py\n>>> {ctx.options.query}\n{result}```")
+
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

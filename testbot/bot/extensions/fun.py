@@ -78,7 +78,6 @@ async def command_wikipedia(ctx: lightbulb.SlashContext) -> None:
         .set_image(image)
         .set_author(name=title,url=f"https://en.wikipedia.org/wiki/{title_link}")
         )
-
         await ctx.respond(embed, reply=True)
         await message.delete()
 

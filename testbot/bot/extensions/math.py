@@ -15,7 +15,6 @@ app_id = 'API-KEY'
 # Search on wolfram website your api-key
 app = wolfram.App(app_id)
    
-
 @plugin.command
 @lightbulb.set_help("Get the stats from wolframalpha")
 @lightbulb.option("search", "The seacrh you need")
@@ -54,7 +53,6 @@ async def command_w(ctx: lightbulb.SlashContext):
     await message.delete()
     await ctx.respond(embed)
 
-
 @plugin.command
 @lightbulb.set_help("Get the steps and solution of a equation")
 @lightbulb.option("equation", "Equation to solve")
@@ -80,8 +78,6 @@ async def command_c(ctx: lightbulb.SlashContext):
     await ctx.respond(f"Result of {equation} is '{result}'.\n")
     await ctx.respond(f"> Possible steps to solution:\n\n{steps}")
 
-
-
 @plugin.command
 @lightbulb.set_help("Convert a plain text to LaTeX")
 @lightbulb.option("expression", "Math expression to convert")
@@ -95,8 +91,6 @@ async def command_latex(ctx: lightbulb.SlashContext):
     )
 
     await ctx.respond(embed)
-
-
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

@@ -80,7 +80,7 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
     if isinstance(event.exception, lightbulb.errors.CheckFailure):
         return None
 
-    await event.context.respond("An error has occurred <:tiste:889343933304426536>, it can be caused by the following:\n - The command is broken.\n - The command is under maintenance.\n Yoy don't use the command correctly look at its help.")
+    await event.context.respond("An error has occurred <:tiste:889343933304426536>, it can be caused by the following:\n - The command is broken.\n - The command is under maintenance.\n - You don't use the command correctly look at its help.")
     raise event.exception
 
 
