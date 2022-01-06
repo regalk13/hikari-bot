@@ -2,12 +2,19 @@ from __future__ import annotations
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import utc
-
+from aiohttp import ClientSession
 from hikari.events.base_events import FailedEventT
+from apscheduler.triggers.cron import CronTrigger
 import os
 import hikari
 import lightbulb
 import logging
+from pathlib import Path
+
+import testbot
+from testbot.bot import db
+
+
 
    
 with open("./secrets/token") as f:
@@ -22,6 +29,8 @@ bot = lightbulb.BotApp(
         intents=hikari.Intents.ALL,
 ) 
 
+bot.d._dynamic = Path("./data/dynamic")
+bot.d._static = bot.d._dynamic.parent / "static"
 bot.load_extensions_from("./testbot/bot/extensions", must_exist=True)
 bot.d.scheduler = AsyncIOScheduler()
 bot.d.scheduler.configure(timezone=utc)
@@ -30,6 +39,13 @@ bot.d.scheduler.configure(timezone=utc)
 @bot.listen(hikari.StartingEvent)
 async def on_starting(_: hikari.StartingEvent) -> None: 
     bot.d.scheduler.start()
+    bot.d.session = ClientSession(trust_env=True)
+    logging.info("AIOHTTP session started")
+
+    bot.d.db = db.Database(bot.d._dynamic, bot.d._static)
+    await bot.d.db.connect()
+    bot.d.scheduler.add_job(bot.d.db.commit, CronTrigger(second=0))
+
 
 @bot.listen(hikari.StartedEvent)
 async def on_started(_: hikari.StartedEvent) -> None:
@@ -41,6 +57,9 @@ async def on_started(_: hikari.StartedEvent) -> None:
 
 @bot.listen(hikari.StoppingEvent)
 async def on_stopping(event: hikari.StoppingEvent) -> None:
+    await bot.d.db.close()
+    await bot.d.session.close()
+    logging.info("AIOHTTP session closed")
     bot.d.scheduler.shutdown() 
     #await bot.d.stdout_channel.send(f"Testing v is shutting now :(") 
 
@@ -72,7 +91,7 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
         return await event.context.respond("<a:Warn:893874049967595550> Too many arguments were passed.")
 
     if isinstance(event.exception, lightbulb.errors.CommandIsOnCooldown):
-        return await event.context.respond(f"<a:Warn:893874049967595550> Command is on cooldown. Try again in {event.exception.retry_in:.0f} second(s).")
+        return await event.context.respond(f"<a:Warn:893874049967595550> Command is on cooldown. Try again in {event.exception.retry_after:.0f} second(s).")
 
     if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
         return await event.context.respond("<a:Wrong:893873540846198844> You don't have the required permissions for this action.")

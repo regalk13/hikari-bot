@@ -242,7 +242,7 @@ async def command_lick(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("shoot", "Shoot someone")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_kiss(ctx: lightbulb.context):
+async def command_shoot(ctx: lightbulb.context):
     target = ctx.options.member
     gif = get_gif("anime-shoot")
 
@@ -258,7 +258,7 @@ async def command_kiss(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("spray", "Spray someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_kiss(ctx: lightbulb.context):
+async def command_spray(ctx: lightbulb.context):
     target = ctx.options.member
     gif = get_gif("anime-spray")
     

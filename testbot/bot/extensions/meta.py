@@ -63,6 +63,11 @@ async def command_userinfo(ctx: lightbulb.SlashContext) -> None:
 
             activity_ = ', '.join(activitys)
     accent_colour = str(fetch_target.accent_color)[1:]
+     
+    row = await ctx.bot.d.db.try_fetch_record(
+        "SELECT cookies FROM cookie WHERE user_id = ?",
+        target.id,
+    )
 
     embed = (hikari.Embed(
         title="User information",
@@ -73,12 +78,13 @@ async def command_userinfo(ctx: lightbulb.SlashContext) -> None:
     .set_image(fetch_target.banner_url or f"https://singlecolorimage.com/get/{accent_colour}/400x100")
     .set_author(name="Information")
     .set_footer(text=f"Requestest by {ctx.member.display_name}", icon=ctx.member.avatar_url)
-    .add_field(name="<:ID:893578566296555520>", value=target.id)
+    .add_field(name="<:ID:893578566296555520>", value=target.id, inline=False)
     .add_field(name="<:User:893597475867336795> Discriminator", value=target.discriminator, inline=True)
     .add_field(name="<:Bot:893579925892767784> Bot?", value=target.is_bot, inline=True)
     .add_field(name="<:Role:893595137387675658> No. of roles", value=len(target.role_ids), inline=True)
-    .add_field(name="<:New:893595680306774047> Created at", value=target.created_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
+    .add_field(name="<:pepe_cookie:928678715309826098> Cookies", value=row.cookies, inline=True)
     .add_field(name="<:Join:893595887853506600> Joined at", value=target.joined_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
+    .add_field(name="<:New:893595680306774047> Created at", value=target.created_at.strftime("%b %d,%Y  %H:%M:%S"), inline=True)
     .add_field(
         name="<:Boost:893579717821755402> Boosted since",
         value=getattr(target.premium_since, "strftime", lambda x: "Not boosting")("%d %b %Y"),

@@ -99,6 +99,11 @@ async def cmd_pep(ctx: lightbulb.SlashContext) -> None:
     n = ctx.options.number
     url = f"https://python.org/dev/peps/pep-{n:>04}"
 
+    async with ctx.bot.d.session.get(url) as r:
+        if not r.ok:
+            await ctx.respond(f"PEP {n:>04} could not be found")
+            return
+
     await ctx.respond(f"PEP {n:>04}: <{url}>")
 
 @plugin.command
@@ -129,6 +134,47 @@ async def cmd_duckduckgo(ctx: lightbulb.SlashContext) -> None:
         return
 
     await ctx.respond(f"<https://lmddgtfy.net/?q={q.replace(' ', '+')}>")
+
+@plugin.command
+@lightbulb.set_help("Give a cookie (1 hour cooldown).")
+@lightbulb.add_cooldown(length=3600, uses=1, bucket=lightbulb.UserBucket)
+@lightbulb.option("user", "User you want give the cookie", hikari.Member)
+@lightbulb.command(name="givecookie", aliases=("gcookie",), description="Give a cookie to a user.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_cookie(ctx: lightbulb.SlashContext) -> None:
+
+    target = ctx.options.user
+
+    if target.id == ctx.member.id:
+        await ctx.respond("You can give a cookie to yourself.")
+        return
+
+    await plugin.bot.d.db.execute(
+         "UPDATE cookie SET cookies = cookies + 1 WHERE user_id = ?", 
+          target.id
+        )
+   
+    row = await ctx.bot.d.db.try_fetch_record(
+        "SELECT cookies FROM cookie WHERE user_id = ?",
+        target.id,
+    )
+
+    r_g = random.randint(1, 255)
+    r_b = random.randint(1, 255)
+    r_r = random.randint(1, 255)
+
+    images_cookies = ["https://i.pinimg.com/originals/fc/39/65/fc3965c433c19f4492d616f975316c8c.gif", "https://64.media.tumblr.com/2f272878761f85dbe7665c1fada53e45/c0f2b8287c49f60d-4b/s540x810/aecab8278a4762d638af1a6dcda55e16c069c458.gif", "https://c.tenor.com/zEWVjcnOt1IAAAAC/anime-eating.gif", "https://c.tenor.com/bBRCCeAYPU8AAAAC/cookie-mashiro.gif"]
+
+    embed = (hikari.Embed(
+        description=f"You gave a cookie to **{target.username}**, now he/she has **{row.cookies}**",
+        colour=Color.from_rgb(r_g, r_b, r_r)
+
+    )
+    .set_image(random.choice(images_cookies))
+    )
+
+
+    await ctx.respond(embed)
 
 
 def load(bot: lightbulb.BotApp) -> None:

@@ -3,3 +3,4 @@ secrets/
 token
 __pycache__/
 backuo/
+data/dynamic
