@@ -10,7 +10,7 @@ plugin = lightbulb.Plugin(name="Actions", description="Multiple actions or react
 #Implements all actions-reactions commands of Nekotina bot in hikari 
     
 def get_gif(term, limit = 14) -> str:
-    api_key = "36SW53ZHFSNF"
+    api_key = "API-KEY"
     limit = limit
     
     r = requests.get("https://g.tenor.com/v1/search?q=%s&key=%s&limit=%s" % (term, api_key, limit))

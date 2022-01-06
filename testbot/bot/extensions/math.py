@@ -11,7 +11,7 @@ import requests
 plugin = lightbulb.Plugin(name="Math", description="Lows and advanced maths commands.")
 
 
-app_id = '7A6EU5-7QY3Q7RKRT'
+app_id = 'API-KEY'
 # Search on wolfram website your api-key
 app = wolfram.App(app_id)
    
@@ -21,37 +21,45 @@ app = wolfram.App(app_id)
 @lightbulb.command(name="w", aliases=("wolframalpha",), description="Seacrh something in wolframalpha")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_w(ctx: lightbulb.SlashContext):
-    message = await ctx.respond("<a:Loading:893842133792997406> loading data...")
-    data = app.full(ctx.options.search)
-    data_ = data['queryresult']['pods']
-    image = None
-    title = data_[0]['subpods'][0]['img']['title']
 
     try:
-        pods_content = data_[1]
-        sub_pods_content = pods_content['subpods']
-        image_content = sub_pods_content[0]['img']['src']
-        image = image_content
+        message = await ctx.respond("<a:Loading:893842133792997406> loading data...")
+        data = app.full(ctx.options.search)
+        data_ = data['queryresult']['pods']
+        image = None
+        title = data_[0]['subpods'][0]['img']['title']
+
+        try:
+            pods_content = data_[1]
+            sub_pods_content = pods_content['subpods']
+            image_content = sub_pods_content[0]['img']['src']
+            image = image_content
+
+        except KeyError:
+            #print(data_)
+            pods_title = data_[0]
+            #print(pods_title)
+            sub_pods_title = pods_title['subpods']
+            #print(sub_pods)
+            image_title = sub_pods_title[0]['img']['src']
+            image = image_title
+
+        embed = (hikari.Embed(
+            title=f"**{title}**",
+            color=Color(0x36393f),
+        )
+        .set_image(image)
+        .set_footer(text=f"Requestest by {ctx.member.username}#{ctx.member.discriminator}", icon=ctx.member.avatar_url)
+        )    
+
+        await message.delete()
+        await ctx.respond(embed)
 
     except KeyError:
-        #print(data_)
-        pods_title = data_[0]
-        #print(pods_title)
-        sub_pods_title = pods_title['subpods']
-        #print(sub_pods)
-        image_title = sub_pods_title[0]['img']['src']
-        image = image_title
+        await message.delete()
+        await ctx.respond("No data found try again...")
+        
 
-    embed = (hikari.Embed(
-        title=f"**{title}**",
-        color=Color(0x36393f),
-    )
-    .set_image(image)
-    .set_footer(text=f"Requestest by {ctx.member.username}#{ctx.member.discriminator}", icon=ctx.member.avatar_url)
-    )    
-
-    await message.delete()
-    await ctx.respond(embed)
 
 @plugin.command
 @lightbulb.set_help("Get the steps and solution of a equation")
