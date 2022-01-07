@@ -1,9 +1,13 @@
 import hikari
+from hikari.errors import HTTPError
 import lightbulb
 import requests
 from hikari.colors import Color
+from riotwatcher import LolWatcher, ApiError
 
 plugin = lightbulb.Plugin(name="Lol", description="League of Legends summoner and champs stats.")
+
+
 
 def data_version():
     ddragon = "https://ddragon.leagueoflegends.com/realms/euw.json"
@@ -88,6 +92,78 @@ async def command_stats(ctx: lightbulb.SlashContext) -> None:
 
     except KeyError:
         await ctx.respond("Champ dont found...")
+
+
+@plugin.command
+@lightbulb.set_help("Get information about a Lol summoner.")
+@lightbulb.option("summoner", "Summoner you need the info.")
+@lightbulb.command(name="summoner", description="Give you Lol summoner stats.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_summoner(ctx: lightbulb.SlashContext):
+    #with open("./secrets/api-key") as f:
+    #    api_key = f.read().strip("\n")
+    api_key = "api"
+    
+    watcher = LolWatcher(api_key)
+    my_region = 'la1'
+    #print(me)
+    try:
+        me = watcher.summoner.by_name(my_region, ctx.options.summoner)
+    except ApiError as err:
+        if err.response.status_code == 429:
+            print('We should retry in {} seconds.'.format(err.headers['Retry-After']))
+            print('this retry-after is handled by default by the RiotWatcher library')
+            print('future requests wait until the retry-after time passes')
+            await ctx.respond("The api has problems to give results try again later")
+            return
+        elif err.response.status_code == 404:
+            await ctx.respond('Summoner with that name not found.')
+            return
+        else:
+            raise
+            return
+    
+    except HTTPError:
+        await ctx.respond('Summoner with that name not found.')
+        return
+
+    my_ranked_stats = watcher.league.by_summoner(my_region, me['id'])
+
+    try:
+        embed = (hikari.Embed(
+            color=Color(0x36393f)
+
+        )
+        .set_author(name=my_ranked_stats[0]['summonerName'])
+        .set_thumbnail(f"http://ddragon.leagueoflegends.com/cdn/12.1.1/img/profileicon/{me['profileIconId']}.png")
+        .add_field(name="Level", value=f"{me['summonerLevel']}")
+        .add_field(name="Ranked (Solo/Duo)", value=f"{my_ranked_stats[1]['tier']} {my_ranked_stats[1]['rank']}")
+        .add_field(name="League Points", value=f"{my_ranked_stats[1]['leaguePoints']}")
+        .add_field(name="Ranked wins", value=f"{my_ranked_stats[1]['wins']}")
+        .add_field(name="Ranked lose", value=f"{my_ranked_stats[1]['losses']}")
+        .add_field(name="Veteran", value=f"{my_ranked_stats[1]['veteran']}")
+        )
+
+        await ctx.respond(embed)
+
+    except IndexError:
+        embed = (hikari.Embed(
+            color=Color(0x36393f),
+        )
+        .set_author(name=me['name'])
+        .set_thumbnail(f"http://ddragon.leagueoflegends.com/cdn/12.1.1/img/profileicon/{me['profileIconId']}.png")
+        .add_field(name="Level", value=f"{me['summonerLevel']}")
+        .add_field(name="Ranked", value="UNRANKED")
+        .add_field(name="League Points", value="Not Valid.")
+        .add_field(name="Ranked wins", value="Not Valid.")
+        .add_field(name="Ranked lose", value="Not Valid.")
+        .add_field(name="Veteran", value="False")
+        )
+
+        await ctx.respond(embed)
+
+   
+    
 
 
 def load(bot: lightbulb.BotApp) -> None:
