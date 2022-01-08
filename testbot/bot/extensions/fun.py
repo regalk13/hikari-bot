@@ -146,16 +146,20 @@ async def cmd_cookie(ctx: lightbulb.SlashContext) -> None:
     target = ctx.options.user
 
     if target.id == ctx.member.id:
-        await ctx.respond("You can give a cookie to yourself.")
+        await ctx.respond("You can't give a cookie to yourself.")
+        return
+
+    if target.is_bot:
+        await ctx.respond("You can't give cookies to bots.")
         return
 
     await plugin.bot.d.db.execute(
-         "UPDATE cookie SET cookies = cookies + 1 WHERE user_id = ?", 
+         "UPDATE user SET cookies = cookies + 1 WHERE user_id = ?", 
           target.id
         )
    
     row = await ctx.bot.d.db.try_fetch_record(
-        "SELECT cookies FROM cookie WHERE user_id = ?",
+        "SELECT cookies FROM user WHERE user_id = ?",
         target.id,
     )
 

@@ -1,3 +1,4 @@
+from typing import Type
 from lightbulb import decorators
 from lightbulb.utils.search import get
 import wolframalpha
@@ -7,11 +8,11 @@ import json, asyncio, wolfram
 from hikari.colors import Color
 import urllib
 import requests
-
+import ast
 plugin = lightbulb.Plugin(name="Math", description="Lows and advanced maths commands.")
 
 
-app_id = 'API-KEY'
+app_id = 'API'
 # Search on wolfram website your api-key
 app = wolfram.App(app_id)
    
@@ -64,7 +65,7 @@ async def command_w(ctx: lightbulb.SlashContext):
 @plugin.command
 @lightbulb.set_help("Get the steps and solution of a equation")
 @lightbulb.option("equation", "Equation to solve")
-@lightbulb.command(name="calc", aliases=("ca",), description="Calculate a equation")
+@lightbulb.command(name="eq", aliases=("equ",), description="Calculate a equation")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_c(ctx: lightbulb.SlashContext):
     equation = ctx.options.equation
@@ -99,6 +100,26 @@ async def command_latex(ctx: lightbulb.SlashContext):
     )
 
     await ctx.respond(embed)
+    
+@plugin.command
+@lightbulb.set_help("Basic Calculator.")
+@lightbulb.option("calc", "The calc you need result")
+@lightbulb.command(name="calc", description="Make basic calculations.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_calc(ctx: lightbulb.SlashContext):
+    try:
+        option = ctx.options.calc
+        parse = ast.parse(option, mode="eval")
+        for node in ast.walk(parse):
+            print(type(node))
+            if type(node) is ast.Call:
+                await ctx.respond("Not valid operation in addition to detecting malicious code this will be reported")
+                return
+
+        result = (eval(compile(parse, "<string>", "eval")))
+        await ctx.respond(f"Result: ```{result}```")
+    except TypeError:
+        await ctx.respond(f"{option} is a not valid math operation.")
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

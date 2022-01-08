@@ -5,19 +5,15 @@ import requests
 from hikari.colors import Color
 from riotwatcher import LolWatcher, ApiError
 
-plugin = lightbulb.Plugin(name="Lol", description="League of Legends summoner and champs stats.")
-
-
+plugin = lightbulb.Plugin(name="LoL", description="League of Legends summoner and champs stats.")
 
 def data_version():
     ddragon = "https://ddragon.leagueoflegends.com/realms/euw.json"
     euw_json = requests.get(ddragon).json()
     return euw_json['n']['champion']
 
-
 def build_data_url():
     return "http://ddragon.leagueoflegends.com/cdn/" + data_version() + "/data/en_GB/champion.json"
-
 
 def get_jsons():
     data_url = build_data_url()
@@ -25,12 +21,10 @@ def get_jsons():
     champ_list = data_json['data'].keys()
     return data_json, champ_list
 
-
 # Not used, but could be implemented to calculate stats at different levels
 def level_math(base, per_level, level):
     level_stat = base + (per_level * level)
     return level_stat
-
 
 def row_headings():
     return [
@@ -102,7 +96,7 @@ async def command_stats(ctx: lightbulb.SlashContext) -> None:
 async def cmd_summoner(ctx: lightbulb.SlashContext):
     #with open("./secrets/api-key") as f:
     #    api_key = f.read().strip("\n")
-    api_key = "api"
+    api_key = "API"
     
     watcher = LolWatcher(api_key)
     my_region = 'la1'
@@ -114,10 +108,13 @@ async def cmd_summoner(ctx: lightbulb.SlashContext):
             print('We should retry in {} seconds.'.format(err.headers['Retry-After']))
             print('this retry-after is handled by default by the RiotWatcher library')
             print('future requests wait until the retry-after time passes')
-            await ctx.respond("The api has problems to give results try again later")
             return
         elif err.response.status_code == 404:
             await ctx.respond('Summoner with that name not found.')
+            return
+
+        elif err.response.status_code == 403:
+            await ctx.respond("The api has problems to give results try again later")
             return
         else:
             raise
@@ -136,12 +133,12 @@ async def cmd_summoner(ctx: lightbulb.SlashContext):
         )
         .set_author(name=my_ranked_stats[0]['summonerName'])
         .set_thumbnail(f"http://ddragon.leagueoflegends.com/cdn/12.1.1/img/profileicon/{me['profileIconId']}.png")
-        .add_field(name="Level", value=f"{me['summonerLevel']}")
-        .add_field(name="Ranked (Solo/Duo)", value=f"{my_ranked_stats[1]['tier']} {my_ranked_stats[1]['rank']}")
-        .add_field(name="League Points", value=f"{my_ranked_stats[1]['leaguePoints']}")
-        .add_field(name="Ranked wins", value=f"{my_ranked_stats[1]['wins']}")
-        .add_field(name="Ranked lose", value=f"{my_ranked_stats[1]['losses']}")
-        .add_field(name="Veteran", value=f"{my_ranked_stats[1]['veteran']}")
+        .add_field(name="Level", value=f"> {me['summonerLevel']}")
+        .add_field(name="Ranked (Solo/Duo)", value=f"> {my_ranked_stats[1]['tier']} {my_ranked_stats[1]['rank']}")
+        .add_field(name="League Points", value=f"> {my_ranked_stats[1]['leaguePoints']}")
+        .add_field(name="Ranked wins", value=f"> {my_ranked_stats[1]['wins']}")
+        .add_field(name="Ranked lose", value=f"> {my_ranked_stats[1]['losses']}")
+        .add_field(name="Veteran", value=f"> {my_ranked_stats[1]['veteran']}")
         )
 
         await ctx.respond(embed)
@@ -152,19 +149,15 @@ async def cmd_summoner(ctx: lightbulb.SlashContext):
         )
         .set_author(name=me['name'])
         .set_thumbnail(f"http://ddragon.leagueoflegends.com/cdn/12.1.1/img/profileicon/{me['profileIconId']}.png")
-        .add_field(name="Level", value=f"{me['summonerLevel']}")
-        .add_field(name="Ranked", value="UNRANKED")
-        .add_field(name="League Points", value="Not Valid.")
-        .add_field(name="Ranked wins", value="Not Valid.")
-        .add_field(name="Ranked lose", value="Not Valid.")
-        .add_field(name="Veteran", value="False")
+        .add_field(name="Level", value=f"> {me['summonerLevel']}")
+        .add_field(name="Ranked", value="> UNRANKED")
+        .add_field(name="League Points", value="> Not Valid.")
+        .add_field(name="Ranked wins", value="> Not Valid.")
+        .add_field(name="Ranked lose", value="> Not Valid.")
+        .add_field(name="Veteran", value="> False")
         )
 
         await ctx.respond(embed)
-
-   
-    
-
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)
