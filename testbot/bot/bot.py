@@ -111,7 +111,7 @@ def run() -> None:
 
     bot.run(
         activity=hikari.Activity(
-            name=f"/help • Version 2.0",
+            name=f"/help • Version 0.2.0",
             type=hikari.ActivityType.WATCHING,
         )
     )

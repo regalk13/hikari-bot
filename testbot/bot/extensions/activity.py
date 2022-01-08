@@ -13,7 +13,7 @@ plugin = lightbulb.Plugin(name="Activity", description="Create and join in game 
 #879863976006127627 - worksnak
 #878067389634314250 - doodlecrew
 
-async def activity_app(ctx, _id, name, image):
+async def activity_app(ctx, _id, name, image) -> None:
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
     voice_state = guild.get_voice_state(user=member.id)

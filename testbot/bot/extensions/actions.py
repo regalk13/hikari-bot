@@ -41,7 +41,7 @@ async def action(ctx: lightbulb.Context, text, image) -> None:
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("kiss", "Kiss someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_kiss(ctx: lightbulb.context):
+async def command_kiss(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     if target.id == ctx.member.id:
         await ctx.respond(f"I don't think you can kiss yourself {ctx.member.mention}")
@@ -55,7 +55,7 @@ async def command_kiss(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("clap", "Just clap or clap for someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_clap(ctx: lightbulb.context):
+async def command_clap(ctx: lightbulb.context) -> None:
     
     target = ctx.options.member
 
@@ -72,7 +72,7 @@ async def command_clap(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("angry", "Shows anger at someone or just angry.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_angry(ctx: lightbulb.context):
+async def command_angry(ctx: lightbulb.context) -> None:
     
     target = ctx.options.member
 
@@ -89,7 +89,7 @@ async def command_angry(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("highfive", "Highfive to someone :)")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_highfive(ctx: lightbulb.context):
+async def command_highfive(ctx: lightbulb.context) -> None:
     
     target = ctx.options.member
 
@@ -101,7 +101,7 @@ async def command_highfive(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("laugh", "Laugh or tease.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_laugh(ctx: lightbulb.context):
+async def command_laugh(ctx: lightbulb.context) -> None:
     
     target = ctx.options.member
 
@@ -117,7 +117,7 @@ async def command_laugh(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("splash", "Splash Splash!!! in someone :)")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_splash(ctx: lightbulb.context):
+async def command_splash(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-splash")
 
@@ -128,7 +128,7 @@ async def command_splash(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("scare", "Show you are scared.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_scare(ctx: lightbulb.context):
+async def command_scare(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-scare")
 
@@ -143,7 +143,7 @@ async def command_scare(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("tsundere", "Tsundere to someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_tsundere(ctx: lightbulb.context):
+async def command_tsundere(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-tsundere")
 
@@ -158,7 +158,7 @@ async def command_tsundere(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("baka", "Tell someone baka.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_baka(ctx: lightbulb.context):
+async def command_baka(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-baka")
     
@@ -173,7 +173,7 @@ async def command_baka(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("cook", "Cook something.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_cook(ctx: lightbulb.context):
+async def command_cook(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-cook")
 
@@ -188,7 +188,7 @@ async def command_cook(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("program", "Programming alone or with someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_program(ctx: lightbulb.context):
+async def command_program(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-programmer", limit=3)
 
@@ -204,7 +204,7 @@ async def command_program(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("handholding", "Take someone's hand.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_handholding(ctx: lightbulb.context):
+async def command_handholding(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-handholding")
 
@@ -219,7 +219,7 @@ async def command_handholding(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("hug", "Just hug someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_hug(ctx: lightbulb.context):
+async def command_hug(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-hug")
 
@@ -231,7 +231,7 @@ async def command_hug(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("lick", "can you lick someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_lick(ctx: lightbulb.context):
+async def command_lick(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-lick")
 
@@ -243,7 +243,7 @@ async def command_lick(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member, required=False)
 @lightbulb.command("shoot", "Shoot someone")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_shoot(ctx: lightbulb.context):
+async def command_shoot(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-shoot")
 
@@ -259,7 +259,7 @@ async def command_shoot(ctx: lightbulb.context):
 @lightbulb.option("member", "The member you choice for make the action.", hikari.Member)
 @lightbulb.command("spray", "Spray someone.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def command_spray(ctx: lightbulb.context):
+async def command_spray(ctx: lightbulb.context) -> None:
     target = ctx.options.member
     gif = get_gif("anime-spray")
     

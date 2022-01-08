@@ -7,12 +7,12 @@ from riotwatcher import LolWatcher, ApiError
 
 plugin = lightbulb.Plugin(name="LoL", description="League of Legends summoner and champs stats.")
 
-def data_version():
+def data_version() -> str:
     ddragon = "https://ddragon.leagueoflegends.com/realms/euw.json"
     euw_json = requests.get(ddragon).json()
     return euw_json['n']['champion']
 
-def build_data_url():
+def build_data_url() -> str:
     return "http://ddragon.leagueoflegends.com/cdn/" + data_version() + "/data/en_GB/champion.json"
 
 def get_jsons():
@@ -26,7 +26,7 @@ def level_math(base, per_level, level):
     level_stat = base + (per_level * level)
     return level_stat
 
-def row_headings():
+def row_headings() -> list:
     return [
         "Name",
         "HP",
@@ -93,7 +93,7 @@ async def command_stats(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.option("summoner", "Summoner you need the info.")
 @lightbulb.command(name="summoner", description="Give you Lol summoner stats.")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def cmd_summoner(ctx: lightbulb.SlashContext):
+async def cmd_summoner(ctx: lightbulb.SlashContext) -> None:
     with open("./secrets/api-key-riot", "r") as f:
         api_key = f.readline()
     watcher = LolWatcher(api_key)

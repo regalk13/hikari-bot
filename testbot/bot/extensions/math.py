@@ -23,7 +23,7 @@ app = wolfram.App(app_id)
 @lightbulb.option("search", "The seacrh you need")
 @lightbulb.command(name="w", aliases=("wolframalpha",), description="Seacrh something in wolframalpha")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def command_w(ctx: lightbulb.SlashContext):
+async def command_w(ctx: lightbulb.SlashContext) -> None:
 
     try:
         message = await ctx.respond("<a:Loading:893842133792997406> loading data...")
@@ -69,7 +69,7 @@ async def command_w(ctx: lightbulb.SlashContext):
 @lightbulb.option("equation", "Equation to solve")
 @lightbulb.command(name="eq", aliases=("equ",), description="Calculate a equation")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def command_c(ctx: lightbulb.SlashContext):
+async def command_c(ctx: lightbulb.SlashContext) -> None:
     equation = ctx.options.equation
     query = urllib.parse.quote_plus(f"solve {equation}")
     query_url = f"http://api.wolframalpha.com/v2/query?" \
@@ -94,7 +94,7 @@ async def command_c(ctx: lightbulb.SlashContext):
 @lightbulb.option("expression", "Math expression to convert")
 @lightbulb.command(name="f", aliases=("Lat",), description="Convert math expression to LaTeX")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def command_latex(ctx: lightbulb.SlashContext):
+async def command_latex(ctx: lightbulb.SlashContext) -> None:
     embed = (hikari.Embed(
         color=Color(0x36393f),
     )
@@ -108,7 +108,7 @@ async def command_latex(ctx: lightbulb.SlashContext):
 @lightbulb.option("calc", "The calc you need result")
 @lightbulb.command(name="calc", description="Make basic calculations.")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def cmd_calc(ctx: lightbulb.SlashContext):
+async def cmd_calc(ctx: lightbulb.SlashContext) -> None:
     try:
         option = ctx.options.calc
         parse = ast.parse(option, mode="eval")

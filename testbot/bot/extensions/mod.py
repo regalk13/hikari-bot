@@ -101,7 +101,7 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
 #@lightbulb.option("user", "The user for delete messages", required=False)
 @lightbulb.command(name="clear", aliases=("purge",), description="Clear messages")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def purge(ctx: lightbulb.SlashContext):
+async def purge(ctx: lightbulb.SlashContext) -> None:
         limit = ctx.options.limit
         if 0 < limit <= 100:
             if limit == 100:
@@ -150,7 +150,7 @@ async def purge(ctx: lightbulb.SlashContext):
 @lightbulb.option("time", "Time to add slowmode")
 @lightbulb.command(name="slowmode", aliases=("sm",), description="Add slowmode to the channel")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def command_slowmode(ctx: lightbulb.SlashContext):
+async def command_slowmode(ctx: lightbulb.SlashContext) -> None:
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
     channel = guild.get_channel(ctx.channel_id)
@@ -190,7 +190,7 @@ async def command_slowmode(ctx: lightbulb.SlashContext):
 @lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
 @lightbulb.command(name="unlock", aliases=("ulck",), description="Unlock to everyone.")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def command_unlock(ctx: lightbulb.SlashContext):
+async def command_unlock(ctx: lightbulb.SlashContext) -> None:
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
     channel_ = guild.get_channel(ctx.channel_id)
@@ -224,7 +224,7 @@ async def command_unlock(ctx: lightbulb.SlashContext):
 @lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_CHANNELS))
 @lightbulb.command(name="lock", aliases=("lck",), description="Lock the channel for moderation.")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
-async def command_lock(ctx: lightbulb.SlashContext):
+async def command_lock(ctx: lightbulb.SlashContext) -> None:
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
     channel_ = guild.get_channel(ctx.channel_id)

@@ -188,7 +188,7 @@ async def cmd_cookie(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.option("time", "Time to end the reminder.", default="5m")
 @lightbulb.command(name="reminder", aliases=("remind",), description="Set a reminder")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def cmd_reminder(ctx: lightbulb.SlashContext):
+async def cmd_reminder(ctx: lightbulb.SlashContext) -> None:
     time = ctx.options.time
     reminder = ctx.options.reminder
     embed = (hikari.Embed(color=0xfa2617, timestamp=datetime.utcnow().astimezone()))
