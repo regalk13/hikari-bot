@@ -63,6 +63,7 @@ async def command_userinfo(ctx: lightbulb.SlashContext) -> None:
 
 
             activity_ = ', '.join(activitys)
+
     accent_colour = str(fetch_target.accent_color)[1:]
      
     userinfo = await ctx.bot.d.db.try_fetch_record(
@@ -247,13 +248,8 @@ async def cmd_setter(ctx: lightbulb.SlashContext) -> None:
     )
 
 
-    await ctx.respond("User info updated.")
+    await ctx.respond("<a:Right:893842032248885249> User info updated sucesfully.")
    
-
-
-
-
-
 @plugin.command()
 @lightbulb.set_help("You can add the bot to your server whit this link.")
 @lightbulb.command(name="invite", description="Get the invite link of the bot")

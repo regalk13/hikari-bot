@@ -102,49 +102,47 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command(name="clear", aliases=("purge",), description="Clear messages")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def purge(ctx: lightbulb.SlashContext):
-    if ctx.options.limit < 2:
-        return await ctx.respond("I cant purge less then 2 messages >:(")
-    elif ctx.options.limit > 100:
-        return await ctx.respond("I cant purge more the 100 messages!")
-    #if not ctx.option.user:
-    message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
-    messages_ = []
-    messages_dont = []
+        limit = ctx.options.limit
+        if 0 < limit <= 100:
+            if limit == 100:
+                limit = limit - 1
 
-    async for messages in plugin.bot.rest.fetch_messages(channel=ctx.channel_id, before=datetime.now().astimezone()).limit(ctx.options.limit):
-        time_between_insertion = datetime.now().astimezone() - messages.created_at
-        if time_between_insertion.days > 14:
-            messages_dont.append(messages)
+            channel = await plugin.bot.rest.fetch_channel(ctx.channel_id)
+            message = await ctx.respond(f"<a:Loading:893842133792997406> Deleting messages.")
+            messages_ = []
+            messages_dont = []
+
+            async for messages in plugin.bot.rest.fetch_messages(channel=channel, before=datetime.now().astimezone()).limit(limit):
+                time_between_insertion = datetime.now().astimezone() - messages.created_at
+                if time_between_insertion.days > 14:
+                    messages_dont.append(messages)
+                else:
+                    messages_.append(messages)
+
+            if len(messages_dont) > 1:
+                    await message.edit(content=f"<a:Wrong:893873540846198844> remember that I can only delete messages 14 days old, {len(messages_dont)} messages will be discarded.")
+                    await asyncio.sleep(5)
+
+            if len(messages_) > 1:
+                await plugin.bot.rest.delete_messages(ctx.channel_id, messages_)
+                if ctx.options.limit == 100:
+                    message_over = await ctx.respond(content=f"<a:Right:893842032248885249> {len(messages_)+1} Message(s) deleted.")
+                    await asyncio.sleep(5)
+                    await message_over.delete()
+                    return
+
+                message_send = await ctx.respond(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+                await asyncio.sleep(5)
+                await message_send.delete()
+            
+            else:
+                message_end = await ctx.respond(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
+                await asyncio.sleep(5)
+                await message_end.delete()
+
+            
         else:
-            messages_.append(messages)
-
-    
-    if len(messages_dont) > 1:
-        await message.edit(content=f"<a:Wrong:893873540846198844> remember that I can only delete messages 14 days old, {len(messages_dont)} messages will be discarded.")
-        await asyncio.sleep(5)
-
-    if len(messages_) > 1:
-        await plugin.bot.rest.delete_messages(ctx.channel_id, messages_)
-        if ctx.options.limit == 100:
-            await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)+1} Message(s) deleted.")
-
-        await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
-        await asyncio.sleep(5)
-        await message.delete()
-            
-    else:
-        await message.edit(content=f"<a:Right:893842032248885249> {len(messages_)} Message(s) deleted.")
-        await asyncio.sleep(5)
-        await message.delete()
-
-    #else:
-    #    def purge_type(m):
-    #        return m.author == ctx.option.user
-
-    #    await ctx.channel.purge(limit=ctx.options.amount+1, check=purge_type)
-    #    await ctx.respond("<a:Right:893842032248885249> {len(messages_)} Message(s) deleted")
-            
-
+            await ctx.respond("<a:Wrong:893873540846198844> The number of messages you want to delete is not within the limits.")
 
 @plugin.command
 @lightbulb.set_help("Add slowmode to the channel: 1s = 1 second, 1m = 1 minute, 1h = 1 hour. Max 6 hours.")
@@ -252,9 +250,6 @@ async def command_lock(ctx: lightbulb.SlashContext):
         )
     )    
     await ctx.respond(f"🔒 channel locked.")
-
-
-
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

@@ -11,8 +11,10 @@ import requests
 import ast
 plugin = lightbulb.Plugin(name="Math", description="Lows and advanced maths commands.")
 
+with open("./secrets/api-math", "r") as f:
+    app_id = f.readline()
 
-app_id = 'API'
+
 # Search on wolfram website your api-key
 app = wolfram.App(app_id)
    

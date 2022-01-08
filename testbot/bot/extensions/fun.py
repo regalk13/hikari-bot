@@ -4,9 +4,11 @@ import random
 import hikari
 import wikipedia
 import requests
+import asyncio
 from hikari.colors import Color
 
 import datetime as dt
+from datetime import datetime, timedelta
 from wikipedia import exceptions
 
 from wikipedia.wikipedia import languages
@@ -179,6 +181,52 @@ async def cmd_cookie(ctx: lightbulb.SlashContext) -> None:
 
 
     await ctx.respond(embed)
+
+@plugin.command()
+@lightbulb.set_help("Set a reminder, will be DM reminder or channel reminder.")
+@lightbulb.option("reminder", "Reminder you want to set.")
+@lightbulb.option("time", "Time to end the reminder.", default="5m")
+@lightbulb.command(name="reminder", aliases=("remind",), description="Set a reminder")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def cmd_reminder(ctx: lightbulb.SlashContext):
+    time = ctx.options.time
+    reminder = ctx.options.reminder
+    embed = (hikari.Embed(color=0xfa2617, timestamp=datetime.utcnow().astimezone()))
+    embed_accepted = (hikari.Embed(color=0x5deb1f, timestamp=datetime.utcnow().astimezone()))
+
+    #embed.set_footer(text="If you have any questions, suggestions or bug reports, please join our support Discord Server: link hidden", icon_url=f"{ctx.avatar_url}")
+    seconds = 0
+    if reminder is None:
+        embed.add_field(name='Warning', value='Please specify what do you want me to remind you about.') # Error message
+    if time.lower().endswith("d"):
+        seconds += int(time[:-1]) * 60 * 60 * 24
+        counter = f"{seconds // 60 // 60 // 24} days"
+    if time.lower().endswith("h"):
+        seconds += int(time[:-1]) * 60 * 60
+        counter = f"{seconds // 60 // 60} hours"
+    elif time.lower().endswith("m"):
+        seconds += int(time[:-1]) * 60
+        counter = f"{seconds // 60} minutes"
+    elif time.lower().endswith("s"):
+        seconds += int(time[:-1])
+        counter = f"{seconds} seconds"
+    if seconds == 0:
+        embed.add_field(name='Warning',
+                        value='Please specify a proper duration, send `/help reminder` for more information.')
+    elif seconds < 300:
+        embed.add_field(name='Warning',
+                        value='You have specified a too short duration!\nMinimum duration is 5 minutes.')
+    elif seconds > 7776000:
+        embed.add_field(name='Warning', value='You have specified a too long duration!\nMaximum duration is 90 days.')
+    else:
+        embed_accepted.add_field(name="Reminder Set", value=f"Alright {ctx.member.username}, I will remind you about ``{reminder}`` in {counter}.")
+        await ctx.respond(embed_accepted)
+        await asyncio.sleep(seconds)
+        await ctx.respond(f"Hi {ctx.member.mention}, you asked me to remind you about ``{reminder}`` {counter} ago.", user_mentions=True)
+        return
+
+    await ctx.respond(embed=embed)
+
 
 
 def load(bot: lightbulb.BotApp) -> None:

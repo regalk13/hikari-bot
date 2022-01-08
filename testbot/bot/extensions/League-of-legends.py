@@ -94,13 +94,10 @@ async def command_stats(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command(name="summoner", description="Give you Lol summoner stats.")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def cmd_summoner(ctx: lightbulb.SlashContext):
-    #with open("./secrets/api-key") as f:
-    #    api_key = f.read().strip("\n")
-    api_key = "API"
-    
+    with open("./secrets/api-key-riot", "r") as f:
+        api_key = f.readline()
     watcher = LolWatcher(api_key)
     my_region = 'la1'
-    #print(me)
     try:
         me = watcher.summoner.by_name(my_region, ctx.options.summoner)
     except ApiError as err:
