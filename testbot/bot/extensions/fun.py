@@ -180,7 +180,6 @@ async def cmd_cookie(ctx: lightbulb.SlashContext) -> None:
     .set_image(random.choice(images_cookies))
     )
 
-
     await ctx.respond(embed)
 
 @plugin.command()

@@ -10,13 +10,16 @@ import hikari
 import lightbulb
 import logging
 from pathlib import Path
+import lavasnek_rs
+from base64 import b64decode
+import sake
 
 import testbot
 from testbot.bot import db
 
 
 
-   
+
 with open("./secrets/token") as f:
     token = f.read().strip("\n")
 
@@ -45,14 +48,15 @@ async def on_starting(_: hikari.StartingEvent) -> None:
     bot.d.db = db.Database(bot.d._dynamic, bot.d._static)
     await bot.d.db.connect()
     bot.d.scheduler.add_job(bot.d.db.commit, CronTrigger(second=0))
-
+    #cache = sake.redis.RedisCache(app=bot, address="redis://127.0.0.1")
+    #await cache.open()
+    logging.info("Connected to Redis server")
 
 @bot.listen(hikari.StartedEvent)
 async def on_started(_: hikari.StartedEvent) -> None:
     #self.add_check(self.guild_only)
     stdout_channel = await bot.rest.fetch_channel(887515478304624730)
     #await stdout_channel.send(f"Testing v2.0 now online!") 
-         
     logging.info("BOT READY!!!")
 
 @bot.listen(hikari.StoppingEvent)
@@ -103,10 +107,10 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
     raise event.exception
 
 
+
 def run() -> None:
     if os.name != "nt":
         import uvloop
-
         uvloop.install()
 
     bot.run(

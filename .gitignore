@@ -4,3 +4,5 @@ token
 __pycache__/
 backuo/
 data/dynamic
+consts.py
+lavalink/
