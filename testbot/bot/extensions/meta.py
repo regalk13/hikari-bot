@@ -246,9 +246,7 @@ async def cmd_setter(ctx: lightbulb.SlashContext) -> None:
         ctx.options.message, 
         ctx.member.id
     )
-
-
-    await ctx.respond("<a:Right:893842032248885249> User info updated sucesfully.")
+    await ctx.respond("<a:Right:893842032248885249> new user information updated successfully.")
    
 @plugin.command()
 @lightbulb.set_help("You can add the bot to your server whit this link.")
