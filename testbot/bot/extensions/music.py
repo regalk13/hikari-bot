@@ -10,10 +10,13 @@ from hikari.colors import Color
 
 HIKARI_VOICE = False
 
-
 class EventHandler:
     """Events from the Lavalink server"""
     async def track_start(self, _: lavasnek_rs.Lavalink, event: lavasnek_rs.TrackStart) -> None:
+        node = await plugin.bot.d.lavalink.get_guild_node(event.guild_id)
+        channel = await node.get_data()
+        stdout_channel = plugin.bot.cache.get_guild_channel(channel)
+        await stdout_channel.send(f"Now Playing: {node.now_playing.track.info.title}") 
         logging.info("Track started on guild: %s", event.guild_id)
 
     async def track_finish(self, _: lavasnek_rs.Lavalink, event: lavasnek_rs.TrackFinish) -> None:
@@ -36,6 +39,7 @@ class EventHandler:
 plugin = lightbulb.Plugin(name="Music", description="Music commands for your bot.")
 
 
+    
 async def _join(ctx: lightbulb.Context) -> Optional[hikari.Snowflake]:
     assert ctx.guild_id is not None
 
@@ -157,6 +161,8 @@ async def play(ctx: lightbulb.SlashContext) -> None:
         # `.requester()` To set who requested the track, so you can show it on now-playing or queue.
         # `.queue()` To add the track to the queue rather than starting to play the track now.
         await plugin.bot.d.lavalink.play(ctx.guild_id, query_information.tracks[0]).requester(ctx.author.id).queue()
+        node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
+        await node.set_data(ctx.channel_id)
     except lavasnek_rs.NoSessionPresent:
         await ctx.respond(f"Use `/join` first")
         return
@@ -252,14 +258,14 @@ async def now_playing(ctx: lightbulb.SlashContext) -> None:
     """Gets the song that's currently playing."""
 
     node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
-
+    data = await node.get_data()
     if not node or not node.now_playing:
         await ctx.respond("Nothing is playing at the moment.")
         return
 
     # for queue, iterate over `node.queue`, where index 0 is now_playing.
     await ctx.respond(f"Now Playing: {node.now_playing.track.info.title}")
-
+    
 
 @plugin.command()
 @lightbulb.set_help("Gets the queque of the curretly songs.")
