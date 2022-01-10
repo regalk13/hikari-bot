@@ -4,7 +4,9 @@ from typing import Optional
 import hikari
 import lightbulb
 import lavasnek_rs
+import random
 
+from hikari.colors import Color
 
 HIKARI_VOICE = False
 
@@ -74,7 +76,7 @@ async def start_lavalink(event: hikari.ShardReadyEvent) -> None:
         # TOKEN can be an empty string if you don't want to use lavasnek's discord gateway.
         lavasnek_rs.LavalinkBuilder(event.my_user.id, token)
         # This is the default value, so this is redundant, but it's here to show how to set a custom one.
-        .set_host("127.0.0.1").set_password('')
+        .set_host("127.0.0.1").set_password('PASSWORD_ADMIN')
     )
 
     if HIKARI_VOICE:
@@ -112,9 +114,17 @@ async def leave(ctx: lightbulb.SlashContext) -> None:
 
     # Destroy nor leave remove the node nor the queue loop, you should do this manually.
     await plugin.bot.d.lavalink.remove_guild_node(ctx.guild_id)
-    await plugin.bot.d.lavalink.remove_guild_from_loops(ctx.guild_id)
+    await plugin.bot.d .lavalink.remove_guild_from_loops(ctx.guild_id)
 
-    await ctx.respond("Left voice channel")
+
+    embed = (hikari.Embed(
+        title="Left voice channel",
+        description="I left the channel correctly.",
+        color=0x5deb1f
+    )
+    )
+
+    await ctx.respond(embed)
 
 
 @plugin.command()
@@ -139,8 +149,8 @@ async def play(ctx: lightbulb.SlashContext) -> None:
     # it will search the query on youtube.
     query_information = await plugin.bot.d.lavalink.auto_search_tracks(query)
 
-    if not query_information.tracks:  # tracks is empty
-        await ctx.respond("Could not find any video of the search query.")
+    if not query_information.tracks:  # tracks is empty    
+        await ctx.respond("<a:Wrong:893873540846198844> Could not find any video of the search query.")
         return
 
     try:
@@ -151,7 +161,12 @@ async def play(ctx: lightbulb.SlashContext) -> None:
         await ctx.respond(f"Use `/join` first")
         return
 
-    await ctx.respond(f"Added to queue: {query_information.tracks[0].info.title}")
+    embed = (hikari.Embed(
+        title=f"Added to queue: {query_information.tracks[0].info.title}",
+        color=0x5deb1f
+    ))
+
+    await ctx.respond(embed)
 
 
 @plugin.command()
@@ -161,7 +176,15 @@ async def stop(ctx: lightbulb.SlashContext) -> None:
     """Stops the current song (skip to continue)."""
 
     await plugin.bot.d.lavalink.stop(ctx.guild_id)
-    await ctx.respond("Stopped playing")
+
+    embed = (hikari.Embed(
+        title="Stopped playing",
+        description="You can use /skip to continue playing songs.",
+        colour=0xfa2617
+    )
+    )
+
+    await ctx.respond(embed)
 
 
 @plugin.command()
@@ -181,7 +204,11 @@ async def skip(ctx: lightbulb.SlashContext) -> None:
         if not node.queue and not node.now_playing:
             await plugin.bot.d.lavalink.stop(ctx.guild_id)
 
-        await ctx.respond(f"Skipped: {skip.track.info.title}")
+        embed = (hikari.Embed(
+            title=f"Skipped: {skip.track.info.title}",
+            color=0x5deb1f
+        ))
+        await ctx.respond(embed)
 
 
 @plugin.command()
@@ -191,7 +218,15 @@ async def pause(ctx: lightbulb.SlashContext) -> None:
     """Pauses the current song."""
 
     await plugin.bot.d.lavalink.pause(ctx.guild_id)
-    await ctx.respond("Paused player")
+
+    embed = (hikari.Embed(
+        title="Paused player",
+        description="You can use /resume to resume the song.",
+        color=0xfa2617
+    ))
+
+
+    await ctx.respond(embed)
 
 
 @plugin.command()
@@ -200,8 +235,14 @@ async def pause(ctx: lightbulb.SlashContext) -> None:
 async def resume(ctx: lightbulb.SlashContext) -> None:
     """Resumes playing the current song."""
 
+    embed = (hikari.Embed(
+        title="Resumed player",
+        color=0x5deb1f
+    ))
+
+
     await plugin.bot.d.lavalink.resume(ctx.guild_id)
-    await ctx.respond("Resumed player")
+    await ctx.respond(embed)
 
 
 @plugin.command()
@@ -221,7 +262,37 @@ async def now_playing(ctx: lightbulb.SlashContext) -> None:
 
 
 @plugin.command()
-@lightbulb.add_checks(lightbulb.guild_only)
+@lightbulb.set_help("Gets the queque of the curretly songs.")
+@lightbulb.command("queue", "Gets the songs in the queue")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def cmd_queue(ctx: lightbulb.SlashContext) -> None:
+
+    node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
+    if not node or not node.queue:
+        await ctx.respond("There are no tracks in the queue.")
+        return
+
+    r_g = random.randint(1, 255)
+    r_b = random.randint(1, 255)
+    r_r = random.randint(1, 255)
+
+    embed = (
+        hikari.Embed(
+            title="Queue",
+            description=f"Showing {len(node.queue)} song(s).",
+            color=Color.from_rgb(r_g, r_b, r_r)
+        )
+        .add_field(name="Now playing", value=node.queue[0].track.info.title)
+    )
+
+    if len(node.queue) > 1:
+        embed.add_field(name="Next up", value="\n".join(tq.track.info.title for tq in node.queue[1:]))
+
+    await ctx.respond(embed)
+
+
+
+@plugin.command()
 @lightbulb.add_checks(lightbulb.owner_only)  # Optional
 @lightbulb.option(
     "args", "The arguments to write to the node data.", required=False, modifier=lightbulb.OptionModifier.CONSUME_REST

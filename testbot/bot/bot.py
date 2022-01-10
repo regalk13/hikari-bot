@@ -48,8 +48,8 @@ async def on_starting(_: hikari.StartingEvent) -> None:
     bot.d.db = db.Database(bot.d._dynamic, bot.d._static)
     await bot.d.db.connect()
     bot.d.scheduler.add_job(bot.d.db.commit, CronTrigger(second=0))
-    #cache = sake.redis.RedisCache(app=bot, address="redis://127.0.0.1")
-    #await cache.open()
+    cache = sake.redis.RedisCache(app=bot, address="redis://127.0.0.1")
+    await cache.open()
     logging.info("Connected to Redis server")
 
 @bot.listen(hikari.StartedEvent)
