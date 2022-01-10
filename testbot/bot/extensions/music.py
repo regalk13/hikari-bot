@@ -7,6 +7,8 @@ import lavasnek_rs
 import random
 
 from hikari.colors import Color
+from hikari.messages import ButtonStyle
+
 
 HIKARI_VOICE = False
 
@@ -14,9 +16,7 @@ class EventHandler:
     """Events from the Lavalink server"""
     async def track_start(self, _: lavasnek_rs.Lavalink, event: lavasnek_rs.TrackStart) -> None:
         node = await plugin.bot.d.lavalink.get_guild_node(event.guild_id)
-        channel = await node.get_data()
-        stdout_channel = plugin.bot.cache.get_guild_channel(channel)
-        await stdout_channel.send(f"Now Playing: {node.now_playing.track.info.title}") 
+        await now_playing_event(node, event)
         logging.info("Track started on guild: %s", event.guild_id)
 
     async def track_finish(self, _: lavasnek_rs.Lavalink, event: lavasnek_rs.TrackFinish) -> None:
@@ -38,8 +38,136 @@ class EventHandler:
 
 plugin = lightbulb.Plugin(name="Music", description="Music commands for your bot.")
 
+async def now_playing_event(node, event_):
+    components = []    
+    componentens_ = plugin.bot.rest.build_action_row() 
+    button_pause = componentens_.add_button(ButtonStyle.PRIMARY, "but_pause").set_label("Pause").add_to_container()
+    button_skip = componentens_.add_button(ButtonStyle.DANGER, "but_skip").set_label("Skip").add_to_container()
+    button_stop = componentens_.add_button(ButtonStyle.PRIMARY, "but_stop").set_label("Stop").add_to_container()
 
-    
+    components.append(componentens_)
+
+    channel = await node.get_data()
+    stdout_channel = plugin.bot.cache.get_guild_channel(channel)
+    response = await stdout_channel.send(
+        hikari.Embed(
+        title=f"Now Playing: {node.now_playing.track.info.title}"
+        ),
+        components=components,
+    )
+
+    with plugin.bot.stream(hikari.InteractionCreateEvent, 120).filter(
+        # Here we filter out events we don't care about.
+        lambda e: (
+            # A component interaction is a button interaction.
+            isinstance(e.interaction, hikari.ComponentInteraction)
+            and e.interaction.message == response
+        )
+        
+    )as stream:
+        async for event in stream:
+            # If we made it through the filter, the user has clicked
+            # one of our buttons, so we grab the custom ID.
+            cid = event.interaction.custom_id
+
+            embed_paused=(hikari.Embed(
+            title=f"Paused: {node.now_playing.track.info.title}"
+            ))
+
+
+            embed_skiped=(hikari.Embed(
+            title=f"Skipped: {node.now_playing.track.info.title}"
+            ))
+
+            embed_stop=(hikari.Embed(
+            title=f"Stopped: {node.now_playing.track.info.title}",
+            description=f"Press ``Skip`` to close the player."
+            ))
+
+            embed_resumed=(hikari.Embed(
+            title=f"Now playing: {node.now_playing.track.info.title}",
+            ))
+
+            if cid == "but_pause":
+                try:
+                    components_ = []
+                    componentens = plugin.bot.rest.build_action_row() 
+                    button_resume = componentens.add_button(ButtonStyle.PRIMARY, "but_resume").set_label("Resume").add_to_container()
+                    button_skip = componentens.add_button(ButtonStyle.DANGER, "but_skip").set_label("Skip").add_to_container()
+                    button_stop = componentens.add_button(ButtonStyle.PRIMARY, "but_stop").set_label("Stop").add_to_container()
+
+                    components_.append(componentens)
+
+
+                    await event.interaction.create_initial_response(
+                        hikari.ResponseType.MESSAGE_UPDATE,
+                        embed=embed_paused,
+                        components=components_
+                    )
+                    await plugin.bot.d.lavalink.pause(event_.guild_id)
+
+                except hikari.NotFoundError:
+                    await event.interaction.edit_initial_response(
+                        embed=embed_paused,
+                    )
+
+            elif cid == "but_skip":
+                try:
+                    await event.interaction.create_initial_response(
+                        hikari.ResponseType.MESSAGE_UPDATE,
+                        embed=embed_skiped,
+                    )
+                    
+                    skip = await plugin.bot.d.lavalink.skip(event_.guild_id)
+                    node = await plugin.bot.d.lavalink.get_guild_node(event_.guild_id)
+
+                    if not skip:
+                        print("Nothing to skip")
+                    else:
+                    # If the queue is empty, the next track won't start playing (because there isn't any),
+                    # so we stop the player.
+                        if not node.queue and not node.now_playing:
+                            await plugin.bot.d.lavalink.stop(event_.guild_id)
+                        
+                        await response.delete()
+
+                except hikari.NotFoundError:
+                    await event.interaction.edit_initial_response(
+                        embed=embed_skiped,
+                    )
+
+            elif cid == "but_stop":
+                try:
+                    await event.interaction.create_initial_response(
+                        hikari.ResponseType.MESSAGE_UPDATE,
+                        embed=embed_stop,
+                    )
+
+                    await plugin.bot.d.lavalink.stop(event_.guild_id)
+                    
+                except:   
+                      await event.interaction.edit_initial_response(
+                        embed=embed_stop,
+                    )
+
+
+            elif cid == "but_resume":
+                try:
+                    await event.interaction.create_initial_response(
+                        hikari.ResponseType.MESSAGE_UPDATE,
+                        embed=embed_resumed,
+                        components=components
+                    )
+                    
+                    
+                    await plugin.bot.d.lavalink.resume(event_.guild_id)
+
+                except:   
+                      await event.interaction.edit_initial_response(
+                        embed=embed_stop,
+                    )
+
+
 async def _join(ctx: lightbulb.Context) -> Optional[hikari.Snowflake]:
     assert ctx.guild_id is not None
 
