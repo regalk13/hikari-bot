@@ -53,12 +53,12 @@ async def cmd_scan_file(ctx: lightbulb.PrefixContext):
         if response["response_code"] == 200:
             if response["results"]["positives"] > 0:
                 link = response["results"]["permalink"]
-                embed_.add_field(name="Malicious file.", value=f"The scanner has detected that this file is malicious [click]({link}).")
+                embed_.add_field(name="Malicious file.", value=f"The scanner has detected this is a malicious file [click]({link}).")
                 await message.delete()
                 await ctx.respond(embed_)
             else:
                 link = response["results"]["permalink"]
-                embed.add_field(name="Safe file.", value=f"The scanner has detected that this is a safe file [click]({link}).")
+                embed.add_field(name="Safe file.", value=f"The scanner has detected this is a safe file [click]({link}).")
                 await message.delete()
                 await ctx.respond(embed)
         else:
