@@ -100,7 +100,7 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.option("limit", "Limit of delete messages", int, default=2)
 #@lightbulb.option("user", "The user for delete messages", required=False)
 @lightbulb.command(name="clear", aliases=("purge",), description="Clear messages")
-@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def purge(ctx: lightbulb.SlashContext) -> None:
         limit = ctx.options.limit
         if 0 < limit <= 100:

@@ -9,7 +9,7 @@ import asyncio
 from hikari.colors import Color
 
 import datetime as dt
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from wikipedia import exceptions
 
 from wikipedia.wikipedia import languages
@@ -259,6 +259,45 @@ async def cmd_ball(ctx: lightbulb.SlashContext):
 
     await ctx.respond(f"🎱 {random.choice(responses)}")
 
+
+@plugin.command()
+@lightbulb.set_help("Use it to show you will be AFK.")
+@lightbulb.option("reason", "The reason to go away.", default="No reason.")
+@lightbulb.command(name="afk", description="Use to go AFK.")
+@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+async def cmd_afk(ctx: lightbulb.SlashContext) -> None:
+    target = ctx.member
+    reason = ctx.options.reason
+
+    r_g = random.randint(1, 255)
+    r_b = random.randint(1, 255)
+    r_r = random.randint(1, 255)
+
+    embed = (hikari.Embed(
+        title="AFK",
+        description=f"Reason: ``{reason}``",
+        color=Color.from_rgb(r_g, r_b, r_r),
+        timestamp=datetime.now().astimezone()
+    )
+    .set_author(name=f"{target.username}#{target.discriminator}", icon=target.avatar_url)
+    .set_thumbnail(target.avatar_url)
+    )
+
+    embed_ = (hikari.Embed(
+        title="AFK Removed",
+        description=f"Welcome back: {target.mention}",
+        color=Color.from_rgb(r_g, r_b, r_r),
+        timestamp=datetime.now().astimezone()
+    )
+    .set_author(name=f"{target.username}#{target.discriminator}", icon=target.avatar_url)
+    .set_thumbnail(target.avatar_url)
+    )
+
+    await ctx.respond(embed)
+
+    wait_info = await plugin.bot.wait_for(hikari.GuildMessageCreateEvent, timeout=None, predicate=lambda x: x.author.id == target.id and x.guild_id == ctx.guild_id)
+    channel = plugin.bot.cache.get_guild_channel(wait_info.channel_id)
+    await channel.send(embed_)
 
 def load(bot: lightbulb.BotApp) -> None:
     bot.add_plugin(plugin)

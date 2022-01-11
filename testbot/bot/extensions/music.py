@@ -1,15 +1,12 @@
 import logging
 from typing import Optional
-
 import hikari
 from hikari.api import voice
 import lightbulb
 import lavasnek_rs
 import random
-
 from hikari.colors import Color
 from hikari.messages import ButtonStyle
-
 
 HIKARI_VOICE = False
 
@@ -269,6 +266,20 @@ async def join(ctx: lightbulb.SlashContext) -> None:
 async def leave(ctx: lightbulb.SlashContext) -> None:
     """Leaves the voice channel the bot is in, clearing the queue."""
 
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
+
+
+
     await plugin.bot.d.lavalink.destroy(ctx.guild_id)
 
     if HIKARI_VOICE:
@@ -299,6 +310,19 @@ async def leave(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def play(ctx: lightbulb.SlashContext) -> None:
     """Searches the query on youtube, or adds the URL to the queue."""
+    
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
+
 
     query = ctx.options.query
 
@@ -343,6 +367,19 @@ async def play(ctx: lightbulb.SlashContext) -> None:
 async def stop(ctx: lightbulb.SlashContext) -> None:
     """Stops the current song (skip to continue)."""
 
+    
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
+
     await plugin.bot.d.lavalink.stop(ctx.guild_id)
 
     embed = (hikari.Embed(
@@ -358,7 +395,19 @@ async def stop(ctx: lightbulb.SlashContext) -> None:
 @plugin.command()
 @lightbulb.command("skip", "Skips the current song.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
-async def skip(ctx: lightbulb.SlashContext) -> None:
+async def skip(ctx: lightbulb.SlashContext) -> None:    
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
+
     """Skips the current song."""
 
     skip = await plugin.bot.d.lavalink.skip(ctx.guild_id)
@@ -373,7 +422,7 @@ async def skip(ctx: lightbulb.SlashContext) -> None:
             await plugin.bot.d.lavalink.stop(ctx.guild_id)
 
         embed = (hikari.Embed(
-            title=f"Skipped: {skip.track.info.title}",
+            description=f"Skipped: **{skip.track.info.title}**",
             color=0x5deb1f
         ))
         await ctx.respond(embed)
@@ -383,6 +432,19 @@ async def skip(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command("pause", "Pauses the current song.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def pause(ctx: lightbulb.SlashContext) -> None:
+    
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
+
     """Pauses the current song."""
 
     await plugin.bot.d.lavalink.pause(ctx.guild_id)
@@ -401,7 +463,18 @@ async def pause(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command("resume", "Resumes playing the current song.")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def resume(ctx: lightbulb.SlashContext) -> None:
-    """Resumes playing the current song."""
+    """Resumes playing the current song."""    
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
 
     embed = (hikari.Embed(
         title="Resumed player",
@@ -418,6 +491,18 @@ async def resume(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def now_playing(ctx: lightbulb.SlashContext) -> None:
     """Gets the song that's currently playing."""
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
+
     node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
 
     r_g = random.randint(1, 255)
@@ -443,6 +528,17 @@ async def now_playing(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command("queue", "Gets the songs in the queue")
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def cmd_queue(ctx: lightbulb.SlashContext) -> None:
+    states = plugin.bot.cache.get_voice_states_view_for_guild(ctx.guild_id)
+    voice_state = [state async for state in states.iterator().filter(lambda i: i.user_id == 892053033792454727 or i.user_id == ctx.member.id)]
+
+    try:
+        if not voice_state[0].channel_id == voice_state[1].channel_id:
+            await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+            return
+
+    except IndexError:
+        await ctx.respond("You need to be on the same voice chat as saiki.", flags=hikari.MessageFlag.EPHEMERAL)
+        return
 
     node = await plugin.bot.d.lavalink.get_guild_node(ctx.guild_id)
     if not node or not node.queue:
