@@ -99,8 +99,7 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
 
     if isinstance(event.exception, lightbulb.errors.NotEnoughArguments):
         return await event.context.respond("<a:Warn:893874049967595550> Some arguments are missing: "+ ", ".join(event.exception.missing_options))
-
-
+        
     if isinstance(event.exception, lightbulb.errors.NotEnoughArguments):
         return await event.context.respond("<a:Warn:893874049967595550> Too many arguments were passed.")
 
