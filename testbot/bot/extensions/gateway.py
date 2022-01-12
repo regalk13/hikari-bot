@@ -16,6 +16,17 @@ async def on_started(_: hikari.StartedEvent) -> None:
     guilds = plugin.bot.rest.fetch_my_guilds()
 
     async for guild in guilds:
+
+        await plugin.bot.d.db.execute(
+            "INSERT OR IGNORE INTO guild (guild_id, guild_name, prefix, mod_mail, log_channel) values (?, ? ,?, ?, ?)",
+            guild.id,
+            guild.name,
+            "-",
+            0,
+            0
+        )
+
+
         async for m in plugin.bot.rest.fetch_members(guild):
             #if (secs := (now - m.joined_at).seconds) <= TIMEOUT:
             #    logging.info(

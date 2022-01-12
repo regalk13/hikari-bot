@@ -19,7 +19,7 @@ plugin = lightbulb.Plugin(name="Mod", description="Commands for moderation (Need
 @lightbulb.option("target", "Target you will kick", hikari.Member)
 @lightbulb.option("reason", "Reason for the kick", default="No reason")
 @lightbulb.command(name="kick", description="Kick the target you mention.")
-@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def command_kick(ctx: lightbulb.SlashContext) -> None:
     log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
     member = ctx.member
@@ -37,9 +37,17 @@ async def command_kick(ctx: lightbulb.SlashContext) -> None:
     .add_field(name="<:Invite:893581721721770064> Reason", value=ctx.options.reason)
     .set_thumbnail(ctx.options.target.avatar_url)
     )
-        
-    await guild.kick(ctx.options.target)
-    await log_channel.send(embed) 
+       
+       
+    try:
+        await guild.kick(ctx.options.target)
+        await log_channel.send(embed)
+        await ctx.respond("<a:Right:893842032248885249> Member kicked.")  
+        return
+
+    except hikari.ForbiddenError:
+        await ctx.respond("<a:Wrong:893873540846198844> I can't kick a admin user or more high role at me.")
+
 
 @plugin.command
 @lightbulb.set_help("If the user has the same of higher permissions, it will not be possible to ban it.")
@@ -47,7 +55,7 @@ async def command_kick(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.option("target", "Target you will ban", hikari.Member)
 @lightbulb.option("reason", "Reason for the ban", default="No reason")
 @lightbulb.command(name="ban", description="Ban the target you mention.")
-@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def command_ban(ctx: lightbulb.SlashContext) -> None:    
     log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
 
@@ -64,17 +72,56 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
     .add_field(name="<:Invite:893581721721770064> Reason", value=ctx.options.reason)
     .set_thumbnail(ctx.options.target.avatar_url)
     )
-        
-    await guild.ban(ctx.options.target)
-    await log_channel.send(embed)
-        
+    
+    try:
+        await guild.ban(ctx.options.target, reason=ctx.options.reason, delete_message_days=7)
+        await log_channel.send(embed)
+        await ctx.respond("<a:Right:893842032248885249> Member banned.")  
+        return
+    
+    except hikari.ForbiddenError:
+        await ctx.respond("<a:Wrong:893873540846198844> I can't ban a admin user or more high role at me.")
+
+@plugin.command
+@lightbulb.set_help("If the user has the same of higher permissions, it will not be possible to softban it.")
+@lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.BAN_MEMBERS))
+@lightbulb.option("target", "Target you will softban.", hikari.Member)
+@lightbulb.option("reason", "Reason for the softban.", default="No reason")
+@lightbulb.command(name="softban", description="Ban and unban a member just to delete 7 days messages")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def command_ban(ctx: lightbulb.SlashContext) -> None:    
+    log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
+
+    member = ctx.member
+    guild = await plugin.bot.rest.fetch_guild(member.guild_id)
+
+    embed = (hikari.Embed(
+            title="Member Softbanned",
+            colour=Color(0xff0000),
+            timestamp=dt.datetime.now().astimezone()
+    )
+    .add_field(name="<:User:893597475867336795> Member", value=f"{ctx.options.target.mention}", inline=True)
+    .add_field(name="<:Staff:893660996458147861> Softbanned by", value=f"{ctx.author.mention}", inline=True)
+    .add_field(name="<:Invite:893581721721770064> Reason", value=ctx.options.reason)
+    .set_thumbnail(ctx.options.target.avatar_url)
+    )
+    
+    try:
+        await guild.ban(ctx.options.target, reason=ctx.options.reason, delete_message_days=7)
+        await log_channel.send(embed)
+        await ctx.respond("<a:Right:893842032248885249> Member Softbanned.")  
+        await guild.unban(ctx.options.target)
+    
+    except hikari.ForbiddenError:
+        await ctx.respond("<a:Wrong:893873540846198844> I can't softban a admin user or more high role at me.")
+
 @plugin.command
 @lightbulb.set_help("You can only unban those who are banned")
 @lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.BAN_MEMBERS))
 @lightbulb.option("target", "Target you will unban", hikari.Member)
 @lightbulb.option("reason", "Reason for the unban", default="No reason")
 @lightbulb.command(name="unban", description="Unban a banned user.")
-@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.SlashCommand)
 async def command_unban(ctx: lightbulb.SlashContext) -> None:
     log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
 
@@ -91,8 +138,15 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
     .add_field(name="<:Invite:893581721721770064> Reason", value=ctx.options.reason)
     .set_thumbnail(ctx.options.target.avatar_url)
     )    
-    await guild.unban(ctx.options.target)
-    await log_channel.send(embed) 
+
+    try:
+        await guild.unban(ctx.options.target)
+        await log_channel.send(embed)
+        await ctx.respond("<a:Right:893842032248885249> Member unbanned")
+        return 
+
+    except hikari.NotFoundError:
+        await ctx.respond("<a:Wrong:893873540846198844> This member is not banned in the guild.")
 
 @plugin.command
 @lightbulb.set_help("The limit for clear messages is 100 and messages of the last 15 days.")

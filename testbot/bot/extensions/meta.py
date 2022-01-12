@@ -247,11 +247,27 @@ async def cmd_setter(ctx: lightbulb.SlashContext) -> None:
         ctx.member.id
     )
     await ctx.respond("<a:Right:893842032248885249> new user information updated successfully.")
-   
+
+@plugin.command()
+@lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.ADMINISTRATOR))
+@lightbulb.set_help("Set the prefix for the guild.")
+@lightbulb.option("prefix", "The prefix you want to the server.")
+@lightbulb.command(name="setprefix", aliases=("prefix",), description="Set the prefix for this guild.")
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
+async def cmd_setter(ctx: lightbulb.SlashContext) -> None:
+    await plugin.bot.d.db.execute(
+        "UPDATE guild SET prefix = ? WHERE guild_id = ?",
+        ctx.options.prefix, 
+        ctx.guild_id
+    )
+
+    await ctx.respond(f"<a:Right:893842032248885249> The new prefix for the server is ``{ctx.options.prefix}``")
+
+
 @plugin.command()
 @lightbulb.set_help("You can add the bot to your server whit this link.")
 @lightbulb.command(name="invite", description="Get the invite link of the bot")
-@lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
+@lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def command_invite(ctx: lightbulb.SlashContext) -> None:
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
