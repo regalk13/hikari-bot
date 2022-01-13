@@ -21,7 +21,7 @@ plugin = lightbulb.Plugin(name="Mod", description="Commands for moderation (Need
 @lightbulb.command(name="kick", description="Kick the target you mention.")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def command_kick(ctx: lightbulb.SlashContext) -> None:
-    log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
+    log_channel_id = await plugin.bot.d.db.try_fetch_record("SELECT log_channel FROM guild WHERE guild_id = ?", ctx.guild_id)
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
 
@@ -41,6 +41,11 @@ async def command_kick(ctx: lightbulb.SlashContext) -> None:
        
     try:
         await guild.kick(ctx.options.target)
+        if log_channel_id.log_channel == 0:
+            await ctx.respond("<a:Right:893842032248885249> Member kicked, but you don't have a log channel use ``/log``.")  
+            return
+
+        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
         await log_channel.send(embed)
         await ctx.respond("<a:Right:893842032248885249> Member kicked.")  
         return
@@ -56,8 +61,9 @@ async def command_kick(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.option("reason", "Reason for the ban", default="No reason")
 @lightbulb.command(name="ban", description="Ban the target you mention.")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def command_ban(ctx: lightbulb.SlashContext) -> None:    
-    log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
+async def command_ban(ctx: lightbulb.SlashContext) -> None:  
+    log_channel_id = await plugin.bot.d.db.try_fetch_record("SELECT log_channel FROM guild WHERE guild_id = ?", ctx.guild_id)
+  
 
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
@@ -75,6 +81,11 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
     
     try:
         await guild.ban(ctx.options.target, reason=ctx.options.reason, delete_message_days=7)
+        if log_channel_id.log_channel == 0:
+            await ctx.respond("<a:Right:893842032248885249> Member banned, but you don't have a log channel use ``/log``.")  
+            return
+
+        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
         await log_channel.send(embed)
         await ctx.respond("<a:Right:893842032248885249> Member banned.")  
         return
@@ -89,8 +100,8 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.option("reason", "Reason for the softban.", default="No reason")
 @lightbulb.command(name="softban", description="Ban and unban a member just to delete 7 days messages")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def command_ban(ctx: lightbulb.SlashContext) -> None:    
-    log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
+async def command_ban(ctx: lightbulb.SlashContext) -> None:
+    log_channel_id = await plugin.bot.d.db.try_fetch_record("SELECT log_channel FROM guild WHERE guild_id = ?", ctx.guild_id)
 
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
@@ -108,9 +119,13 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
     
     try:
         await guild.ban(ctx.options.target, reason=ctx.options.reason, delete_message_days=7)
+        await guild.unban(ctx.options.target)
+        if log_channel_id.log_channel == 0:
+            await ctx.respond("<a:Right:893842032248885249> Member softbanned, but you don't have a log channel use ``/log``.")  
+            return
+        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
         await log_channel.send(embed)
         await ctx.respond("<a:Right:893842032248885249> Member Softbanned.")  
-        await guild.unban(ctx.options.target)
     
     except hikari.ForbiddenError:
         await ctx.respond("<a:Wrong:893873540846198844> I can't softban a admin user or more high role at me.")
@@ -123,7 +138,7 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
 @lightbulb.command(name="unban", description="Unban a banned user.")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def command_unban(ctx: lightbulb.SlashContext) -> None:
-    log_channel = await plugin.bot.rest.fetch_channel(887515478304624730)
+    log_channel_id = await plugin.bot.d.db.try_fetch_record("SELECT log_channel FROM guild WHERE guild_id = ?", ctx.guild_id)
 
     member = ctx.member
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
@@ -141,6 +156,10 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
 
     try:
         await guild.unban(ctx.options.target)
+        if log_channel_id.log_channel == 0:
+            await ctx.respond("<a:Right:893842032248885249> Member unbanned, but you don't have a log channel use ``/log``.")  
+            return
+        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
         await log_channel.send(embed)
         await ctx.respond("<a:Right:893842032248885249> Member unbanned")
         return 
@@ -163,7 +182,24 @@ async def command_modmail(ctx: lightbulb.SlashContext) -> None:
     )
     channel = await plugin.bot.rest.fetch_channel(ctx.options.channel.id)    
     await ctx.respond(f"{channel.mention} Set like ModMail channel succesfully <a:Right:893842032248885249>")
-    
+
+
+@plugin.command
+@lightbulb.set_help("Add channel for the logs to this server")
+@lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.ADMINISTRATOR))
+@lightbulb.option("channel", "Channel you will set for the logs", hikari.GuildChannel)
+@lightbulb.command(name="log", description="Set a channel for logs.")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def command_log_channel(ctx: lightbulb.SlashContext) -> None:
+    await plugin.bot.d.db.execute(
+        "UPDATE guild SET log_channel = ? WHERE guild_id = ?", 
+        ctx.options.channel.id,
+        ctx.guild_id
+    )
+    channel = await plugin.bot.rest.fetch_channel(ctx.options.channel.id)    
+    await ctx.respond(f"{channel.mention} Set for log channel succesfully <a:Right:893842032248885249>")
+
+
 @plugin.command
 @lightbulb.set_help("The limit for clear messages is 100 and messages of the last 15 days.")
 @lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_MESSAGES))
