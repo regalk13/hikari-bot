@@ -1,6 +1,8 @@
 import asyncio
 import logging
+from tarfile import ExFileObject
 from typing import DefaultDict
+from xml.dom import NotFoundErr
 from hikari import PermissionOverwrite, PermissionOverwriteType
 from hikari.permissions import Permissions
 import lightbulb
@@ -45,10 +47,16 @@ async def command_kick(ctx: lightbulb.SlashContext) -> None:
             await ctx.respond("<a:Right:893842032248885249> Member kicked, but you don't have a log channel use ``/log``.")  
             return
 
-        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
-        await log_channel.send(embed)
-        await ctx.respond("<a:Right:893842032248885249> Member kicked.")  
-        return
+        try:
+            log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
+            await log_channel.send(embed)
+            await ctx.respond("<a:Right:893842032248885249> Member kicked.")  
+            return
+
+        except hikari.NotFoundError:
+            await ctx.respond("<a:Right:893842032248885249> Member kicked, but you don't have a log channel use ``/log``.")  
+            return
+
 
     except hikari.ForbiddenError:
         await ctx.respond("<a:Wrong:893873540846198844> I can't kick a admin user or more high role at me.")
@@ -86,10 +94,15 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
             return
 
         log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
-        await log_channel.send(embed)
-        await ctx.respond("<a:Right:893842032248885249> Member banned.")  
-        return
-    
+        try:
+            await log_channel.send(embed)
+            await ctx.respond("<a:Right:893842032248885249> Member banned.")  
+            return
+
+        except hikari.NotFoundError:
+            await ctx.respond("<a:Right:893842032248885249> Member banned, but you don't have a log channel use ``/log``.")  
+            return
+
     except hikari.ForbiddenError:
         await ctx.respond("<a:Wrong:893873540846198844> I can't ban a admin user or more high role at me.")
 
@@ -123,9 +136,14 @@ async def command_ban(ctx: lightbulb.SlashContext) -> None:
         if log_channel_id.log_channel == 0:
             await ctx.respond("<a:Right:893842032248885249> Member softbanned, but you don't have a log channel use ``/log``.")  
             return
-        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
-        await log_channel.send(embed)
-        await ctx.respond("<a:Right:893842032248885249> Member Softbanned.")  
+        try:
+            log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
+            await log_channel.send(embed)
+            await ctx.respond("<a:Right:893842032248885249> Member Softbanned.")  
+        
+        except hikari.NotFoundError:
+            await ctx.respond("<a:Right:893842032248885249> Member softbanned, but you don't have a log channel use ``/log``.")  
+            return
     
     except hikari.ForbiddenError:
         await ctx.respond("<a:Wrong:893873540846198844> I can't softban a admin user or more high role at me.")
@@ -159,10 +177,14 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
         if log_channel_id.log_channel == 0:
             await ctx.respond("<a:Right:893842032248885249> Member unbanned, but you don't have a log channel use ``/log``.")  
             return
-        log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
-        await log_channel.send(embed)
-        await ctx.respond("<a:Right:893842032248885249> Member unbanned")
-        return 
+        try:
+            log_channel = await plugin.bot.rest.fetch_channel(log_channel_id.log_channel)
+            await log_channel.send(embed)
+            await ctx.respond("<a:Right:893842032248885249> Member unbanned")
+            return 
+
+        except hikari.NotFoundError:
+            await ctx.respond("<a:Right:893842032248885249> Member unbanned, but you don't have a log channel use ``/log``.")
 
     except hikari.NotFoundError:
         await ctx.respond("<a:Wrong:893873540846198844> This member is not banned in the guild.")

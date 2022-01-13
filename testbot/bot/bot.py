@@ -40,7 +40,6 @@ bot = lightbulb.BotApp(
         prefix=get_prefix,
         token=token,
         help_slash_command=True,
-        default_enabled_guilds=(862093766646169609, 798708207668297749, 915060025637109781),
         case_insensitive_prefix_commands=True,
         intents=hikari.Intents.ALL,
 ) 
@@ -207,7 +206,7 @@ def run() -> None:
 
     bot.run(
         activity=hikari.Activity(
-            name=f"/help • Version 0.2.2",
+            name=f"/help • Version 0.2.3",
             type=hikari.ActivityType.WATCHING,
         )
     )

@@ -192,7 +192,7 @@ async def command_botinfo(ctx: lightbulb.SlashContext) -> None:
     guilds = plugin.bot.cache.get_guilds_view()
     users = plugin.bot.cache.get_members_view()
     componetens_ = plugin.bot.rest.build_action_row() 
-    button = componetens_.add_button(ButtonStyle.LINK, f"https://discord.com/api/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot%20applications.commands").set_label("Invite the bot").add_to_container()
+    button = componetens_.add_button(ButtonStyle.LINK, f"https://discord.com/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot%20applications.commands").set_label("Invite the bot").add_to_container()
     source_code = button.add_button(ButtonStyle.LINK, f"https://github.com/regalk13/hikari-bot").set_label("Source code").add_to_container()
 
 
@@ -278,7 +278,7 @@ async def command_invite(ctx: lightbulb.SlashContext) -> None:
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
     bot = guild.get_my_member()
     componetens_ = plugin.bot.rest.build_action_row() 
-    button = componetens_.add_button(ButtonStyle.LINK, f"https://discord.com/api/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot%20applications.commands").set_label("Invite the bot").add_to_container()
+    button = componetens_.add_button(ButtonStyle.LINK, f"https://discord.com/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot%20applications.commands").set_label("Invite the bot").add_to_container()
         
     r_g = random.randint(1, 255)
     r_b = random.randint(1, 255)
