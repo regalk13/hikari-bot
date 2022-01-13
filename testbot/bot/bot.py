@@ -1,5 +1,8 @@
 from __future__ import annotations
+from datetime import date
+from multiprocessing.connection import wait
 
+from hikari.colors import Color
 import typing as t
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from hikari.guilds import Guild
@@ -18,7 +21,9 @@ import lavasnek_rs
 from base64 import b64decode
 import sake
 from hikari.api import ActionRowBuilder
+from datetime import datetime
 
+import random
 import testbot
 from testbot.bot import db
 
@@ -98,7 +103,7 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
     await message.delete()
 
     response = await event.message.respond(
-        f"Hello, welcome to the Saiki ModMail service, you can select between the servers that we share and that have a modmail configured, also you can always send a message to the devs (better bug reports).",
+        f"Hello, welcome to the Saiki ModMail service, you can select between the servers that we share and that have a modmail configured (if you don't see your favorite server tell an admin to use ``/modmail``), also you can always send a message to the devs (better bug reports).",
         component=option.add_to_container()
         )
         
@@ -117,15 +122,55 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
                     "Write the message will be sent to my devs. (Timeout 2 minutes)")
 
                 wait_info = await bot.wait_for(hikari.DMMessageCreateEvent, timeout=120, predicate=lambda x: x.author.id == event.interaction.user.id)
-
+                await event.interaction.message.respond("<a:Right:893842032248885249> The message has been sent to the developers succesfully.")
                 content = wait_info.message.content
+                
+                r_g = random.randint(1, 255)
+                r_b = random.randint(1, 255)
+                r_r = random.randint(1, 255)
+
+                embed = (hikari.Embed(
+                    description=f"Devs Message from {wait_info.author.mention}",
+                    colour=Color.from_rgb(r_g, r_b, r_r),
+                    timestamp=datetime.now().astimezone()
+
+                )
+                .set_author(name=f"{wait_info.author.username}#{wait_info.author.discriminator}", icon=f"{wait_info.author.avatar_url}")
+                .set_thumbnail(wait_info.author.avatar_url)
+                .add_field(name="<:ID:893578566296555520> User ID", value=wait_info.author_id, inline=True)
+                .add_field(name="<:Members:893581084762185739> Name", value=wait_info.author.username, inline=True)
+                .add_field(name="<:Presence:893596200148811776> Message", value=f"``{content}``")
+                )
+                
                 stdout_channel = await bot.rest.fetch_channel(887515478304624730)                
-                await stdout_channel.send(content)
+                await stdout_channel.send(embed)
 
+            else:
+                await event.interaction.create_initial_response(
+                    hikari.ResponseType.MESSAGE_CREATE,
+                    "Write the message will be sent to this server. (Timeout 2 minutes)")
+                wait_info = await bot.wait_for(hikari.DMMessageCreateEvent, timeout=120, predicate=lambda x: x.author.id == event.interaction.user.id)
+                await event.interaction.message.respond("<a:Right:893842032248885249> The message has been sent to the ModMail channel of this server succesfully.")
+                content = wait_info.message.content
+                r_g = random.randint(1, 255)
+                r_b = random.randint(1, 255)
+                r_r = random.randint(1, 255)
 
+                embed = (hikari.Embed(
+                    description=f"ModMail from {wait_info.author.mention}",
+                    colour=Color.from_rgb(r_g, r_b, r_r),
+                    timestamp=datetime.now().astimezone()
 
-
-
+                )
+                .set_author(name=f"{wait_info.author.username}#{wait_info.author.discriminator}", icon=f"{wait_info.author.avatar_url}")
+                .set_thumbnail(wait_info.author.avatar_url)
+                .add_field(name="<:ID:893578566296555520> User ID", value=wait_info.author_id, inline=True)
+                .add_field(name="<:Members:893581084762185739> Name", value=wait_info.author.username, inline=True)
+                .add_field(name="<:Presence:893596200148811776> Message", value=f"``{content}``")
+                )
+                modmail = await bot.d.db.try_fetch_record("SELECT mod_mail FROM guild WHERE guild_id = ?", event.interaction.values[0])
+                stdout_channel = await bot.rest.fetch_channel(modmail.mod_mail)                
+                await stdout_channel.send(embed)
 
 
 @bot.listen(hikari.ExceptionEvent)
