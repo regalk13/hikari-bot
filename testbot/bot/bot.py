@@ -199,6 +199,17 @@ async def on_join_guild(event: hikari.GuildJoinEvent) -> None:
                     0
                 )        
 
+@bot.listen(hikari.MemberCreateEvent)
+async def on_member_join(event: hikari.MemberCreateEvent) -> None:
+    if not event.member.is_bot:
+        await bot.d.db.execute(
+                "INSERT OR IGNORE INTO user (user_id, user_name, descrip, cookies) VALUES (?, ?, ?, ?)",
+                event.member.id,
+                event.member.username,
+                f"Displaying information for {event.member.mention}",
+                0
+            )
+        return
 
 
 @bot.listen(hikari.ExceptionEvent)
