@@ -80,7 +80,7 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
     if event.message.author.is_bot:
         return
 
-    message = await event.message.respond("Loading your info.")    
+    message = await event.message.respond("<a:Loading:893842133792997406> Loading your information.")    
     guilds = bot.rest.fetch_my_guilds()
     row = bot.rest.build_action_row()
     select_menu = row.add_select_menu("select_guild").set_placeholder("Select The Guild").set_min_values(1).set_max_values(1)
@@ -91,10 +91,9 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
             async for m in bot.rest.fetch_members(guild.id):
                 if not m.is_bot:
                     if m.id == event.message.author.id:
-                        option = option_devs.add_option(guild.name, guild.name).set_description(guild.name).add_to_menu()
+                        option = option_devs.add_option(guild.name, guild.name).set_description(guild.name).add_to_menu()        
         else:
             option = option_devs
-
 
     await message.delete()
 
@@ -103,10 +102,6 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
         component=option.add_to_container()
         )
         
-
-
-   
-
 @bot.listen(hikari.ExceptionEvent)
 async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
     raise event.exception

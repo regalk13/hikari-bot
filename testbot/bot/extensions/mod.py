@@ -148,6 +148,22 @@ async def command_unban(ctx: lightbulb.SlashContext) -> None:
     except hikari.NotFoundError:
         await ctx.respond("<a:Wrong:893873540846198844> This member is not banned in the guild.")
 
+
+@plugin.command
+@lightbulb.set_help("Add channel for the modmails to this server")
+@lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.ADMINISTRATOR))
+@lightbulb.option("channel", "Channel you will set for the modmail", hikari.GuildChannel)
+@lightbulb.command(name="modmail", description="Set a channel for modmail.")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def command_modmail(ctx: lightbulb.SlashContext) -> None:
+    await plugin.bot.d.db.execute(
+        "UPDATE guild SET mod_mail = ? WHERE guild_id = ?", 
+        ctx.options.channel.id,
+        ctx.guild_id
+    )
+    channel = await plugin.bot.rest.fetch_channel(ctx.options.channel.id)    
+    await ctx.respond(f"{channel.mention} Set like ModMail channel succesfully <a:Right:893842032248885249>")
+    
 @plugin.command
 @lightbulb.set_help("The limit for clear messages is 100 and messages of the last 15 days.")
 @lightbulb.add_checks(lightbulb.has_role_permissions(hikari.Permissions.MANAGE_MESSAGES))
