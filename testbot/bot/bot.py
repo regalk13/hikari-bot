@@ -172,6 +172,35 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
                 await stdout_channel.send(embed)
 
 
+@bot.listen(hikari.GuildJoinEvent)
+async def on_join_guild(event: hikari.GuildJoinEvent) -> None:
+        await bot.d.db.execute(
+            "INSERT OR IGNORE INTO guild (guild_id, guild_name, prefix, mod_mail, log_channel) values (?, ? ,?, ?, ?)",
+            event.guild.id,
+            event.guild.name,
+            "-",
+            0,
+            0
+        )
+
+
+        async for m in bot.rest.fetch_members(event.guild.id):
+            #if (secs := (now - m.joined_at).seconds) <= TIMEOUT:
+            #    logging.info(
+            #        f"Member '{m.display_name}' joined while offline, scheduling action "
+            #        f"in {TIMEOUT-secs} seconds..."
+            #    )
+            if not m.is_bot:
+                await bot.d.db.execute(
+                    "INSERT OR IGNORE INTO user (user_id, user_name, descrip, cookies) VALUES (?, ?, ?, ?)",
+                    m.id,
+                    m.username,
+                    f"Displaying information for {m.mention}",
+                    0
+                )        
+
+
+
 @bot.listen(hikari.ExceptionEvent)
 async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
     raise event.exception
@@ -192,12 +221,20 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
 
     if isinstance(event.exception, lightbulb.errors.MissingRequiredPermission):
         return await event.context.respond("<a:Wrong:893873540846198844> You don't have the required permissions for this action.")
-        
+
+    if isinstance(event.exception, lightbulb.errors.BotMissingRequiredPermission):
+        return await event.context.respond("<a:Wrong:893873540846198844> I don't have the required permissions for this action.")
+
+    if isinstance(event.exception.__cause__, hikari.ForbiddenError):
+        await event.context.respond("<a:Wrong:893873540846198844> Something is missing perms or missed ids.")
+        raise event.exception
+
     if isinstance(event.exception, lightbulb.errors.CheckFailure):
         return None
 
     await event.context.respond("An error has occurred <:tiste:889343933304426536>, it can be caused by the following:\n - The command is broken.\n - The command is under maintenance.\n - You don't use the command correctly look at its help.")
     raise event.exception
+
 
 def run() -> None:
     if os.name != "nt":
