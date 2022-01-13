@@ -191,7 +191,12 @@ async def command_botinfo(ctx: lightbulb.SlashContext) -> None:
     guild = await plugin.bot.rest.fetch_guild(member.guild_id)
     guilds = plugin.bot.cache.get_guilds_view()
     users = plugin.bot.cache.get_members_view()
-        
+    componetens_ = plugin.bot.rest.build_action_row() 
+    button = componetens_.add_button(ButtonStyle.LINK, f"https://discord.com/api/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot%20applications.commands").set_label("Invite the bot").add_to_container()
+    source_code = button.add_button(ButtonStyle.LINK, f"https://github.com/regalk13/hikari-bot").set_label("Source code").add_to_container()
+
+
+
     message = await ctx.respond("<a:Loading:893842133792997406> Loading data")    
     members = []
     for user in users:
@@ -233,7 +238,7 @@ async def command_botinfo(ctx: lightbulb.SlashContext) -> None:
     )
 
     await message.delete()
-    await ctx.respond(embed, reply=True)
+    await ctx.respond(embed, component=source_code, reply=True)
 
 @plugin.command()
 @lightbulb.set_help("Set the message will appear in the command -ui.")
