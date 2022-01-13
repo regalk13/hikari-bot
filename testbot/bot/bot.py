@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import typing as t
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from hikari.guilds import Guild
+from lightbulb.commands import message
+from lightbulb.decorators import option
 from pytz import utc
 from aiohttp import ClientSession
 from hikari.events.base_events import FailedEventT
@@ -13,6 +17,7 @@ from pathlib import Path
 import lavasnek_rs
 from base64 import b64decode
 import sake
+from hikari.api import ActionRowBuilder
 
 import testbot
 from testbot.bot import db
@@ -35,19 +40,11 @@ bot = lightbulb.BotApp(
         intents=hikari.Intents.ALL,
 ) 
 
-
-
-
-
 bot.d._dynamic = Path("./data/dynamic")
 bot.d._static = bot.d._dynamic.parent / "static"
 bot.load_extensions_from("./testbot/bot/extensions", must_exist=True)
 bot.d.scheduler = AsyncIOScheduler()
 bot.d.scheduler.configure(timezone=utc)
-
-
-
-
 
 @bot.listen(hikari.StartingEvent)
 async def on_starting(_: hikari.StartingEvent) -> None: 
@@ -83,10 +80,32 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
     if event.message.author.is_bot:
         return
 
-    await event.message.respond(
-        f"The function of modmail is being carried out."
-    )
+    message = await event.message.respond("Loading your info.")    
+    guilds = bot.rest.fetch_my_guilds()
+    row = bot.rest.build_action_row()
+    select_menu = row.add_select_menu("select_guild").set_placeholder("Select The Guild").set_min_values(1).set_max_values(1)
+    option_devs = select_menu.add_option("Message to devs", "Message to devs").set_description("This message will be sent to my devs.").add_to_menu()
+    async for guild in guilds:
+        modmail = await bot.d.db.try_fetch_record("SELECT mod_mail FROM guild WHERE guild_id = ?", guild.id)
+        if not modmail.mod_mail == 0:
+            async for m in bot.rest.fetch_members(guild.id):
+                if not m.is_bot:
+                    if m.id == event.message.author.id:
+                        option = option_devs.add_option(guild.name, guild.name).set_description(guild.name).add_to_menu()
+        else:
+            option = option_devs
 
+
+    await message.delete()
+
+    await event.message.respond(
+        f"Hello, welcome to the Saiki ModMail service, you can select between the servers that we share and that have a modmail configured, also you can always send a message to the devs (better bug reports).",
+        component=option.add_to_container()
+        )
+        
+
+
+   
 
 @bot.listen(hikari.ExceptionEvent)
 async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
@@ -114,8 +133,6 @@ async def on_command_error(event: lightbulb.CommandErrorEvent) -> None:
 
     await event.context.respond("An error has occurred <:tiste:889343933304426536>, it can be caused by the following:\n - The command is broken.\n - The command is under maintenance.\n - You don't use the command correctly look at its help.")
     raise event.exception
-
-
 
 def run() -> None:
     if os.name != "nt":
