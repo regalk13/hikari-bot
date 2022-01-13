@@ -91,17 +91,43 @@ async def on_dm_message_create(event: hikari.DMMessageCreateEvent) -> None:
             async for m in bot.rest.fetch_members(guild.id):
                 if not m.is_bot:
                     if m.id == event.message.author.id:
-                        option = option_devs.add_option(guild.name, guild.name).set_description(guild.name).add_to_menu()        
+                        option = option_devs.add_option(guild.name, guild.id).set_description(guild.name).add_to_menu()        
         else:
             option = option_devs
 
     await message.delete()
 
-    await event.message.respond(
+    response = await event.message.respond(
         f"Hello, welcome to the Saiki ModMail service, you can select between the servers that we share and that have a modmail configured, also you can always send a message to the devs (better bug reports).",
         component=option.add_to_container()
         )
         
+    with bot.stream(hikari.InteractionCreateEvent, 1200).filter(
+        # Here we filter out events we don't care about.
+        lambda e: (
+            # A component interaction is a button interaction.
+            isinstance(e.interaction, hikari.ComponentInteraction)
+            and e.interaction.message == response
+        )
+    )as stream:
+        async for event in stream:
+            if event.interaction.values[0] == "Message to devs":
+                await event.interaction.create_initial_response(
+                    hikari.ResponseType.MESSAGE_CREATE,
+                    "Write the message will be sent to my devs. (Timeout 2 minutes)")
+
+                wait_info = await bot.wait_for(hikari.DMMessageCreateEvent, timeout=120, predicate=lambda x: x.author.id == event.interaction.user.id)
+
+                content = wait_info.message.content
+                stdout_channel = await bot.rest.fetch_channel(887515478304624730)                
+                await stdout_channel.send(content)
+
+
+
+
+
+
+
 @bot.listen(hikari.ExceptionEvent)
 async def on_error(event: hikari.ExceptionEvent[FailedEventT]) -> None:
     raise event.exception
