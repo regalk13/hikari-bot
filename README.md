@@ -5,7 +5,7 @@ A discord bot written in python using hikari and several libraries that add more
 You can add the bot [here](https://discord.com/oauth2/authorize?client_id=892053033792454727&permissions=8&scope=bot%20applications.commands).
 
 
-🍃_Saiki Free & open and powerfull_🍃
+🍃 _Saiki Free & open and powerfull_ 🍃
 
 
 # Running the bot
