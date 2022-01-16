@@ -12,7 +12,7 @@ You can add the bot [here](https://discord.com/oauth2/authorize?client_id=892053
 
 ## Installing dependencies
 
-You will need Python 3.10 or higher to run this bot () 
+You will need Python 3.10 or higher to run this bot (lavasek library that will be used to broadcast music has problems with 3.10 in linux, if this is your case then change the code a little, especially the annotations and you can use it in 3.9) 
 
 ```
 # To run the bot:
