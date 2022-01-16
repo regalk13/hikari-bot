@@ -20,7 +20,7 @@ plugin = lightbulb.Plugin(name="Meta", description="Information about the bot, u
 @lightbulb.command(name="ping", description="Get the ping of bot")
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def command_ping(ctx: lightbulb.SlashContext) -> None:
-    await ctx.respond(f"Pong! Latency {ctx.bot.heartbeat_latency * 1_000:,.0f} ms.")
+    await ctx.respond(f"🏓Pong! Latency: ``{ctx.bot.heartbeat_latency * 1_000:,.0f}ms``")
 
 @plugin.command()
 @lightbulb.set_help("If you don't mention anybody, will show your own user info.")
